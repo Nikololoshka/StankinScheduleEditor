@@ -1,0 +1,27 @@
+﻿<?xml version="1.0"?>
+<timetable group="IDB-17-09" year="2019">
+    <Monday>
+        <pair time="12:20">
+            <title>Прикладная физическая культура</title>
+            <lecturer>None</lecturer>
+            <type>Лекция</type>
+            <subgroup>None</subgroup>
+            <classroom>С/3 СТАНКИН</classroom>
+
+            <date frequency="None">04.02</date>
+        </pair>
+        <pair time="12:20">
+            <title>Прикладная физическая культура</title>
+            <lecturer>None</lecturer>
+            <type>Семинар</type>
+            <subgroup>None</subgroup>
+            <classroom>С/3 СТАНКИН</classroom>
+            <date frequency="Every">11.02-20.05</date>
+        </pair>
+    </Monday>
+    <Tuesday></Tuesday>
+    <Wednesday></Wednesday>
+    <Thursday></Thursday>
+    <Friday></Friday>
+    <Saturday></Saturday>
+</timetable>
