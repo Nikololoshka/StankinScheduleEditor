@@ -1,14 +1,17 @@
 # !/usr/bin/python3
-# utf-8
+# coding: utf-8
 
+# imports
 import sys
 from PyQt5.QtWidgets import QApplication
-from editor_window import EditorWindow
+from schedule_editor_window import ScheduleEditorWindow
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    w = EditorWindow()
+    w = ScheduleEditorWindow()
+    w.setWindowTitle("Schedule Editor")
+    w.setMaximumSize(800, 600)
     w.show()
 
     sys.exit(app.exec_())
