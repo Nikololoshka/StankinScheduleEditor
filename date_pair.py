@@ -11,9 +11,9 @@ import itertools
 
 class FrequencyPair(Enum):
     """ Enum describing the frequency of student classes """
-    ONCE = 1
-    EVERY = 2
-    THROUGHOUT = 3
+    ONCE = "once"
+    EVERY = "every"
+    THROUGHOUT = "throughout"
 
 
 class InvalidDatePair(Exception):
@@ -30,14 +30,14 @@ class DateItem:
         self.date = str_date
 
     @staticmethod
-    def compact_date(date_str):
+    def compact_date(date_str) -> str:
         """
         Returns a compact representation of the date. I.e. "%d.%m"
         Example: 2019.02.24 -> 24.02
         """
         return datetime.strptime(date_str, "%Y.%m.%d").strftime("%d.%m")
 
-    def is_less(self, other):
+    def is_less(self, other) -> bool:
         """
         Compares dates. If the original date is less than the comparable one,
         then it returns true, otherwise it is false.
@@ -56,6 +56,11 @@ class DateItem:
 
         raise InvalidDatePair("Impossible to compare: {} with {}"
                               .format(self.__class__.__name__, other.__class__.__name__))
+
+    def to_xml_element(self) -> Xml.Element:
+        element = Xml.Element("date", {"frequency": FrequencyPair.ONCE.value})
+        element.text = self.date
+        return element
 
     def __contains__(self, item):
         if item == self.date:
@@ -94,6 +99,11 @@ class DateRange:
         raise InvalidDatePair("Impossible to compare: {} with {}"
                               .format(self.__class__.__name__, other.__class__.__name__))
 
+    def to_xml_element(self) -> Xml.Element:
+        element = Xml.Element("date", {"frequency": self.frequency.value})
+        element.text = "{}-{}".format(self.date_from, self.date_to)
+        return element
+
     def __contains__(self, item):
         if self.frequency == FrequencyPair.EVERY:
             delta = timedelta(days=7)
@@ -115,16 +125,19 @@ class DateRange:
         return False
 
     def __str__(self):
-        return "{} - {} {}".format(DateItem.compact_date(self.date_from),
+        return "{}-{} {}".format(DateItem.compact_date(self.date_from),
                                    DateItem.compact_date(self.date_to),
                                    "к.н." if self.frequency == FrequencyPair.EVERY else "ч.н.")
 
 
 class DatePair:
     """ Class describing the date of student pairs """
-    def __init__(self, xml_file: Xml.Element):
+    def __init__(self):
         self._dates = list()
 
+    @staticmethod
+    def from_xml_element(xml_file: Xml.Element):
+        d = DatePair()
         for date_tag in xml_file:
             try:
                 frequency = FrequencyPair[date_tag.attrib["frequency"].upper()]
@@ -135,16 +148,24 @@ class DatePair:
                     date_parse = DateRange(*date_tag.text.split("-"), frequency)
 
                 i = 0
-                while i < len(self._dates):
-                    if not self._dates[i].is_less(date_parse):
+                while i < len(d._dates):
+                    if not d._dates[i].is_less(date_parse):
                         break
                     i += 1
 
-                self._dates.insert(i, date_parse)
+                d._dates.insert(i, date_parse)
 
             except KeyError:
                 raise InvalidDatePair("Could not read the \"date\", because the frequency \"{}\" is not correct"
                                       .format(date_tag.attrib["frequency"]))
+        return d
+
+    def to_xml_element(self) -> Xml.Element:
+        element = Xml.Element("dates")
+        for x in self._dates:
+            element.append(x.to_xml_element())
+
+        return element
 
     def __contains__(self, item):
         for x in self._dates:
@@ -181,7 +202,7 @@ if __name__ == '__main__':
     ]
 
     el = Xml.fromstring("<dates>" + "".join(dates_lst) + "</dates>")
-    date = DatePair(el)
+    date = DatePair.from_xml_element(el)
 
     print("True:", "2019.03.30" in date)
 
@@ -190,7 +211,7 @@ if __name__ == '__main__':
     count = 0
     for lst in itertools.permutations(dates_lst):
         el = Xml.fromstring("<dates>" + "".join(lst) + "</dates>")
-        date = DatePair(el)
+        date = DatePair.from_xml_element(el)
 
         if str(date) == correct_str:
             # print("cool\t", d,)
