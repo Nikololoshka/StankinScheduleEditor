@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
 <schedule group="IDB-17-09" year="2019">
-    <Monday>
+    <monday>
         <pair>
             <title>Прикладная физическая культура</title>
             <lecturer>None</lecturer>
@@ -43,5 +43,15 @@
                 <date frequency="every">2019.02.04-2019.05.20</date>
             </dates>
         </pair>
-    </Monday>
+    </monday>
+    <tuesday>
+    </tuesday>
+    <wednesday>
+    </wednesday>
+    <thursday>
+    </thursday>
+    <friday>
+    </friday>
+    <saturday>
+    </saturday>
 </schedule>
