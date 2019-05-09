@@ -3,6 +3,7 @@
 # imports
 import xml.etree.ElementTree as Xml
 from date_pair import DatePair
+from time_pair import TimePair
 
 
 class StudentPair:
@@ -14,8 +15,12 @@ class StudentPair:
             "type": xml_file.findtext("type"),
             "subgroup": xml_file.findtext("subgroup"),
             "classroom": xml_file.findtext("classroom"),
-            "dates": DatePair(xml_file.find("dates"))
+            "time": TimePair.from_xml_element(xml_file.find("time")),
+            "dates": DatePair.from_xml_element(xml_file.find("dates"))
         }
+
+    def get_number(self):
+        return self._pair["time"].get_number()
 
     def get_value(self, key):
         """ Returned value pair by key. If the key is not found will return 'None' """
@@ -24,14 +29,26 @@ class StudentPair:
     def to_xml_element(self):
         """ Create XML file of the student pair """
         element = Xml.Element("pair")
+        lst = ["title", "lecturer", "type", "subgroup", "classroom"]
+        for x in lst:
+            sub_element = Xml.SubElement(element, x)
+            sub_element.text = self._pair[x]
 
-        for tag, value in self._pair.items():
-            element.set(tag, value)
+        element.append(self._pair["time"].to_xml_element())
+        element.append(self._pair["dates"].to_xml_element())
 
         return element
 
     def __str__(self):
-        return "'StudentPair': " + str(self._pair)
+        lst = ["title", "lecturer", "type", "subgroup", "classroom"]
+        s = ""
+        for x in lst:
+            if self._pair[x] != "None":
+                s += self._pair[x] + ". "
+
+        s += "[" + str(self._pair["dates"]) + "]"
+
+        return s
 
 
 if __name__ == '__main__':
@@ -45,6 +62,6 @@ if __name__ == '__main__':
     print("root - tag: '{}', attrib: {}".format(root.tag, root.attrib))
 
     for day_of_week in root:
-        print(day_of_week.tag)
         for pair in day_of_week:
-            print("\t", StudentPair(pair))
+            sp = StudentPair(pair)
+            print(sp)
