@@ -8,8 +8,29 @@ from time_pair import TimePair
 
 class StudentPair:
     """ Class describing the student pair """
-    def __init__(self, xml_file: Xml.Element):
-        self._pair = {
+    def __init__(self):
+        self.pair = {
+            "title": None,
+            "lecturer": None,
+            "type": None,
+            "subgroup": None,
+            "classroom": None,
+            "time": None,
+            "dates": None
+        }
+
+    def get_number(self):
+        return self.pair["time"].get_number()
+
+    def update(self, key, value):
+        self.pair[key] = value
+
+    def get_value(self, key):
+        """ Returned value pair by key. If the key is not found will return 'None' """
+        return self.pair.get(key)
+
+    def load(self, xml_file: Xml.Element):
+        self.pair = {
             "title": xml_file.findtext("title"),
             "lecturer": xml_file.findtext("lecturer"),
             "type": xml_file.findtext("type"),
@@ -18,24 +39,18 @@ class StudentPair:
             "time": TimePair.from_xml_element(xml_file.find("time")),
             "dates": DatePair.from_xml_element(xml_file.find("dates"))
         }
+        return self
 
-    def get_number(self):
-        return self._pair["time"].get_number()
-
-    def get_value(self, key):
-        """ Returned value pair by key. If the key is not found will return 'None' """
-        return self._pair.get(key)
-
-    def to_xml_element(self):
+    def save(self):
         """ Create XML file of the student pair """
         element = Xml.Element("pair")
         lst = ["title", "lecturer", "type", "subgroup", "classroom"]
         for x in lst:
             sub_element = Xml.SubElement(element, x)
-            sub_element.text = self._pair[x]
+            sub_element.text = self.pair[x]
 
-        element.append(self._pair["time"].to_xml_element())
-        element.append(self._pair["dates"].to_xml_element())
+        element.append(self.pair["time"].to_xml_element())
+        element.append(self.pair["dates"].to_xml_element())
 
         return element
 
@@ -43,10 +58,10 @@ class StudentPair:
         lst = ["title", "lecturer", "type", "subgroup", "classroom"]
         s = ""
         for x in lst:
-            if self._pair[x] != "None":
-                s += self._pair[x] + ". "
+            if self.pair[x] != "None":
+                s += self.pair[x] + ". "
 
-        s += "[" + str(self._pair["dates"]) + "]"
+        s += "[" + str(self.pair["dates"]) + "]"
 
         return s
 
@@ -63,5 +78,5 @@ if __name__ == '__main__':
 
     for day_of_week in root:
         for pair in day_of_week:
-            sp = StudentPair(pair)
+            sp = StudentPair().load(pair)
             print(sp)

@@ -1,13 +1,13 @@
 # coding: utf-8
 
 # imports
-from PyQt5 import QtGui
-from PyQt5.QtWidgets import qApp, QMainWindow, QFileDialog, QTableWidget, QTableWidgetItem, \
-                            QAction, QAbstractItemView, QHeaderView, QSizePolicy
-from PyQt5.QtCore import Qt, QModelIndex, QSize
-from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+
 from schedule import Schedule
 from window_helper import MyHeaderView, compute_font_for_text
+from pair_selector_window import PairSelectorWindow
 import defaults
 
 
@@ -16,6 +16,7 @@ class ScheduleEditorWindow(QMainWindow):
         super().__init__()
 
         self.schedule = Schedule()
+        self.file = None
 
         # window settings
         self.setWindowTitle("Schedule Editor")
@@ -60,14 +61,17 @@ class ScheduleEditorWindow(QMainWindow):
         action_save.setShortcut("Ctrl+S")
         menu_file.addAction(action_save)
 
-        action_export = QAction("&Export", self)
+        action_save_as = QAction("Save as...", self)
+        action_save_as.setShortcut("Ctrl+S+A")
+        menu_file.addAction(action_save_as)
+
+        action_export = QAction("Export", self)
         action_export.setShortcut("Ctrl+E")
         menu_file.addAction(action_export)
 
         menu_file.addSeparator()
 
-        action_about = QAction("A&bout", self)
-        action_about.setShortcut("Ctrl+B")
+        action_about = QAction("About", self)
         menu_file.addAction(action_about)
 
         action_exit = QAction("&Quit", self)
@@ -81,25 +85,26 @@ class ScheduleEditorWindow(QMainWindow):
         action_new_file.triggered.connect(self.action_new_file_clicked)
         action_open.triggered.connect(self.action_open_clicked)
         action_save.triggered.connect(self.action_save_clicked)
+        action_save_as.triggered.connect(self.action_save_as_clicked)
         action_export.triggered.connect(self.action_export_clicked)
         action_about.triggered.connect(self.action_about_clicked)
         action_exit.triggered.connect(self.close)
 
         self.table_widget.doubleClicked.connect(self.cell_clicked)
 
-    def resizeEvent(self, a0: QtGui.QResizeEvent) -> None:
+    def resizeEvent(self, a0: QResizeEvent) -> None:
         self.update_table_widget()
         super().resizeEvent(a0)
 
     def update_table_widget(self):
         for i, day in enumerate(self.schedule.schedule_list.values()):
             for j, times in enumerate(day.values()):
-                item = QTableWidgetItem("")
+                text = ""
+                for k, pair in enumerate(times):
+                    text += str(pair) + "\n"
+
+                item = QTableWidgetItem(text)
                 item.setTextAlignment(Qt.AlignTop | Qt.AlignLeft)
-
-                for pair in times:
-                    item.setText(item.text() + str(pair) + ". ")
-
                 font = compute_font_for_text(item.text(),
                                              Qt.AlignTop | Qt.AlignLeft | Qt.TextWordWrap,
                                              self.cell_size(j, i))
@@ -112,26 +117,35 @@ class ScheduleEditorWindow(QMainWindow):
                      self.table_widget.rowHeight(row))
 
     def action_new_file_clicked(self):
-        print("action_new_file_clicked")
+        pass
 
     def action_open_clicked(self):
-        file_name = QFileDialog.getOpenFileName(self, "Open xml file",
-                                                "./temp",
-                                                "XML file (*.xml)")[0]
-        if file_name == "":
+        path = QFileDialog.getOpenFileName(self, "Open xml file", "./temp", "XML file (*.xml)")[0]
+        if path == "":
             return
-
-        self.schedule.load(file_name)
-        self.update_table_widget()
+        try:
+            self.schedule.load(path)
+            self.file = QFileInfo(path)
+            self.update_table_widget()
+        except Exception as e:
+            QMessageBox.critical(self, "Error", str(e),)
 
     def action_save_clicked(self):
-        print("action_save_clicked")
+        pass
+
+    def action_save_as_clicked(self):
+        path = QFileDialog.getSaveFileName(self, "Save schedule as xml file", "./temp", "XML file (*.xml)")[0]
+        if path == "":
+            return
+        self.schedule.save(path + ".xml")
 
     def action_export_clicked(self):
-        print("action_export_clicked")
+        pass
 
     def action_about_clicked(self):
-        print("action_about_clicked")
+        pass
 
     def cell_clicked(self, index: QModelIndex):
-        print("clicked")
+        creator = PairSelectorWindow(self.schedule, index, self)
+        creator.exec_()
+        self.update_table_widget()

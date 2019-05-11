@@ -1,9 +1,9 @@
 # coding: utf-8
 
 # imports
-from PyQt5.QtWidgets import qApp, QHeaderView
-from PyQt5.QtCore import Qt, QSize, QRect, QPoint
-from PyQt5.QtGui import QFont, QFontMetrics
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 
 
 def compute_font_for_text(text: str, flags: int, size: QSize) -> QFont:

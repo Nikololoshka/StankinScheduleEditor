@@ -133,7 +133,7 @@ class DateRange:
 class DatePair:
     """ Class describing the date of student pairs """
     def __init__(self):
-        self._dates = list()
+        self.dates = list()
 
     @staticmethod
     def from_xml_element(xml_file: Xml.Element):
@@ -148,12 +148,12 @@ class DatePair:
                     date_parse = DateRange(*date_tag.text.split("-"), frequency)
 
                 i = 0
-                while i < len(d._dates):
-                    if not d._dates[i].is_less(date_parse):
+                while i < len(d.dates):
+                    if not d.dates[i].is_less(date_parse):
                         break
                     i += 1
 
-                d._dates.insert(i, date_parse)
+                d.dates.insert(i, date_parse)
 
             except KeyError:
                 raise InvalidDatePair("Could not read the \"date\", because the frequency \"{}\" is not correct"
@@ -162,13 +162,13 @@ class DatePair:
 
     def to_xml_element(self) -> Xml.Element:
         element = Xml.Element("dates")
-        for x in self._dates:
+        for x in self.dates:
             element.append(x.to_xml_element())
 
         return element
 
     def __contains__(self, item):
-        for x in self._dates:
+        for x in self.dates:
             if item in x:
                 return True
 
@@ -176,9 +176,9 @@ class DatePair:
 
     def __str__(self):
         s = ""
-        for i in range(len(self._dates)):
-            s += str(self._dates[i])
-            if i != len(self._dates) - 1:
+        for i in range(len(self.dates)):
+            s += str(self.dates[i])
+            if i != len(self.dates) - 1:
                 s += ", "
 
         return s

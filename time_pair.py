@@ -23,7 +23,7 @@ class TimePair:
                         xml_file.findtext("end"),
                         xml_file.attrib.get("count"))
 
-    def get_number(self):
+    def get_number(self) -> int:
         return defaults.get_time_start().index(self._start)
 
     def to_xml_element(self) -> Xml.Element:
