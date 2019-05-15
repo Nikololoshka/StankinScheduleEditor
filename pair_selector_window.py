@@ -4,11 +4,15 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from schedule import Schedule
-from student_pair import StudentPair
+from pair import StudentPair
 from pair_creator_window import PairCreatorWindow
 
 
 class PairSelectorWindow(QDialog):
+
+    pairsListChanged = pyqtSignal()
+    SaveRole = Qt.UserRole + 1
+
     def __init__(self, scheduler_ref: Schedule, index: QModelIndex, parent: QWidget = None):
         super().__init__(parent)
 
@@ -58,15 +62,26 @@ class PairSelectorWindow(QDialog):
         pairs = self.scheduler_ref.pairs_by_index(self.index.row(), self.index.column())
         for pair in pairs:
             item = QListWidgetItem(str(pair))
+            item.setData(PairSelectorWindow.SaveRole, pair)
             self.list_widget.addItem(item)
+
+        self.pairsListChanged.emit()
+
+    def remove_pair(self, item):
+        remove_pair = item.data(PairSelectorWindow.SaveRole)
+        pairs = self.scheduler_ref.pairs_by_index(self.index.row(), self.index.column())
+        for pair in pairs:
+            if pair == remove_pair:
+                pairs.remove(pair)
+                break
 
     def push_button_new_clicked(self):
         new_pair = StudentPair()
         creator = PairCreatorWindow(self.scheduler_ref, self.index, new_pair, self)
+        creator.pairChanged.connect(self.update_pairs_list)
         creator.exec_()
-        if creator.has_change():
-            self.scheduler_ref.pairs_by_index(self.index.row(), self.index.column()).append(new_pair)
 
+        self.scheduler_ref.add_pair(new_pair)
         self.update_pairs_list()
 
     def push_button_edit_clicked(self):
@@ -75,15 +90,14 @@ class PairSelectorWindow(QDialog):
             QMessageBox.information(self, "Information", "No pair selected")
             return
 
-        edit_pair = StudentPair()
-        pairs = self.scheduler_ref.pairs_by_index(self.index.row(), self.index.column())
-        for pair in pairs:
-            if str(pair) == item.text():
-                edit_pair = pair
-                break
+        edit_pair = item.data(PairSelectorWindow.SaveRole)
+        self.remove_pair(item)
 
         creator = PairCreatorWindow(self.scheduler_ref, self.index, edit_pair, self)
+        creator.pairChanged.connect(self.update_pairs_list)
         creator.exec_()
+
+        self.scheduler_ref.add_pair(edit_pair)
         self.update_pairs_list()
 
     def push_button_remove_clicked(self):
@@ -92,10 +106,5 @@ class PairSelectorWindow(QDialog):
             QMessageBox.information(self, "Information", "No pair selected")
             return
 
-        pairs = self.scheduler_ref.pairs_by_index(self.index.row(), self.index.column())
-        for pair in pairs:
-            if str(pair) == item.text():
-                pairs.remove(pair)
-                break
-
+        self.remove_pair(item)
         self.update_pairs_list()

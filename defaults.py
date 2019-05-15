@@ -14,7 +14,7 @@ def prettify(elem):
 
 def get_lecturers() -> set:
     """ Returns a list of lecturers """
-    with open("/res/lecturers.txt", "r") as file:
+    with open("./res/lecturers.txt", "r") as file:
         return set(line for line in file)
 
 
@@ -31,6 +31,3 @@ def get_time_end() -> tuple:
 def get_time_start_end(number) -> str:
     return "{} - {}".format(get_time_start()[number], get_time_end()[number])
 
-
-def get_day_of_weeks() -> tuple:
-    return "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"

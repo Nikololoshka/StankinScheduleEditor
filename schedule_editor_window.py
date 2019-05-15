@@ -6,7 +6,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 from schedule import Schedule
-from window_helper import MyHeaderView, compute_font_for_text
+from pair import DaysOfWeek
+from window_helper import CustomHeaderView, compute_font_for_text
 from pair_selector_window import PairSelectorWindow
 import defaults
 
@@ -24,11 +25,14 @@ class ScheduleEditorWindow(QMainWindow):
 
         # central widget settings
         self.table_widget = QTableWidget()
-        self.table_widget.setVerticalHeader(MyHeaderView())
+        self.table_widget.setVerticalHeader(CustomHeaderView(Qt.Vertical))
+        self.table_widget.setHorizontalHeader(CustomHeaderView(Qt.Horizontal))
         self.table_widget.setWordWrap(True)
         self.table_widget.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table_widget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.table_widget.horizontalHeader().setMaximumHeight(25)
         self.table_widget.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.table_widget.verticalHeader().setMaximumWidth(25)
         self.table_widget.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
         self.table_widget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.table_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -39,7 +43,7 @@ class ScheduleEditorWindow(QMainWindow):
             self.table_widget.setHorizontalHeaderItem(i, item)
 
         self.table_widget.setRowCount(6)
-        for i, day in enumerate(defaults.get_day_of_weeks()):
+        for i, day in enumerate(DaysOfWeek.to_list()):
             item = QTableWidgetItem(day)
             self.table_widget.setVerticalHeaderItem(i, item)
 
@@ -49,19 +53,19 @@ class ScheduleEditorWindow(QMainWindow):
         menu_bar = self.menuBar()
         menu_file = menu_bar.addMenu("&File")
 
-        action_new_file = QAction("&New file", self)
+        action_new_file = QAction(QIcon.fromTheme("document-new"), "&New file", self)
         action_new_file.setShortcut("Ctrl+N")
         menu_file.addAction(action_new_file)
 
-        action_open = QAction("&Open", self)
+        action_open = QAction(QIcon.fromTheme("document-open"), "&Open", self)
         action_open.setShortcut("Ctrl+O")
         menu_file.addAction(action_open)
 
-        action_save = QAction("&Save", self)
+        action_save = QAction(QIcon.fromTheme("document-save"), "&Save", self)
         action_save.setShortcut("Ctrl+S")
         menu_file.addAction(action_save)
 
-        action_save_as = QAction("Save as...", self)
+        action_save_as = QAction(QIcon.fromTheme("document-save-as"), "Save as...", self)
         action_save_as.setShortcut("Ctrl+S+A")
         menu_file.addAction(action_save_as)
 
@@ -120,7 +124,7 @@ class ScheduleEditorWindow(QMainWindow):
         pass
 
     def action_open_clicked(self):
-        path = QFileDialog.getOpenFileName(self, "Open xml file", "./temp", "XML file (*.xml)")[0]
+        path = QFileDialog.getOpenFileName(self, "Open xml file", "./examples", "XML file (*.xml)")[0]
         if path == "":
             return
         try:
@@ -134,7 +138,7 @@ class ScheduleEditorWindow(QMainWindow):
         pass
 
     def action_save_as_clicked(self):
-        path = QFileDialog.getSaveFileName(self, "Save schedule as xml file", "./temp", "XML file (*.xml)")[0]
+        path = QFileDialog.getSaveFileName(self, "Save schedule as xml file", "./examples", "XML file (*.xml)")[0]
         if path == "":
             return
         self.schedule.save(path + ".xml")
@@ -146,6 +150,7 @@ class ScheduleEditorWindow(QMainWindow):
         pass
 
     def cell_clicked(self, index: QModelIndex):
-        creator = PairSelectorWindow(self.schedule, index, self)
-        creator.exec_()
+        selector = PairSelectorWindow(self.schedule, index, self)
+        selector.pairsListChanged.connect(self.update_table_widget)
+        selector.exec_()
         self.update_table_widget()
