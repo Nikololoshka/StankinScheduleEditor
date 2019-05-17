@@ -36,11 +36,13 @@ class Schedule:
         with open(path, "w") as file:
             element_schedule = Xml.Element("schedule")
             for day, times in self.schedule_list.items():
-                element_day = Xml.Element(day)
+                element_day = Xml.Element(day.value)
                 for time, pairs in times.items():
                     for pair in pairs:
                         element_day.append(pair.save())
+
                 element_schedule.append(element_day)
+
             file.write(defaults.prettify(element_schedule))
 
     def pairs_by_index(self, i, j) -> list:
