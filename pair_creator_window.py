@@ -6,6 +6,7 @@ from PyQt5.QtCore import *
 from schedule import Schedule
 from pair import StudentPair, StudentPairAttrib, TypePairAttrib, \
                  SubgroupPairAttrib, TimePair
+from date_creator_window import DateCreatorWindow
 import defaults
 
 
@@ -19,6 +20,7 @@ class PairCreatorWindow(QDialog):
         self.scheduler_ref: Schedule = scheduler_ref
         self.index: QModelIndex = index
         self.edit_pair: StudentPair = edit_pair
+        self._change: bool = False
 
         # window settings
         self.setWindowTitle("Creator")
@@ -119,8 +121,7 @@ class PairCreatorWindow(QDialog):
 
         self.vertical_layout_right.addStretch(1)
 
-        for date in str(self.edit_pair.get_value(StudentPairAttrib.Date)).split(","):
-            self.list_widget_date.addItem(date.strip())
+        self.update_list_widget_date()
 
         # navigate
         self.horizontal_layout_down = QHBoxLayout()
@@ -150,21 +151,24 @@ class PairCreatorWindow(QDialog):
 
         # connection
         self.combo_box_start.currentIndexChanged.connect(self.combo_box_start_changed)
+        self.push_button_add_date.clicked.connect(self.push_button_add_date_clicked)
+        self.push_button_edit_date.clicked.connect(self.push_button_edit_date_clicked)
+        self.push_button_remove_date.clicked.connect(self.push_button_remove_date_clicked)
         self.push_button_ok.clicked.connect(self.push_button_ok_clicked)
         self.push_button_cancel.clicked.connect(self.close)
 
     def save(self) -> bool:
-        title = self.line_edit_title.text()
+        title = self.line_edit_title.text().strip()
         if title == "":
             QMessageBox.information(self, "Information", "Title field is empty")
             return False
 
-        lecturer = self.line_edit_lecturer.text()
+        lecturer = self.line_edit_lecturer.text().strip()
         if lecturer == "":
             QMessageBox.information(self, "Information", "Lecturer field is empty")
             return False
 
-        classes = self.line_edit_classes.text()
+        classes = self.line_edit_classes.text().strip()
         if classes == "":
             QMessageBox.information(self, "Information", "Classes field is empty")
             return False
@@ -182,7 +186,52 @@ class PairCreatorWindow(QDialog):
         self.edit_pair.get_value(StudentPairAttrib.Subgroup).set_subgroup(subgroup)
         self.edit_pair.get_value(StudentPairAttrib.Time).set_time(start_time, end_time)
 
+        self._change = True
+
         return True
+
+    def is_change(self):
+        return self._change
+
+    def push_button_add_date_clicked(self):
+        date_creator = DateCreatorWindow(self)
+        date_creator.exec_()
+        create_date = date_creator.get_date()
+        if create_date is not None:
+            self.edit_pair.get_value(StudentPairAttrib.Date).add_date(create_date)
+            self.update_list_widget_date()
+
+    def push_button_edit_date_clicked(self):
+        item = self.list_widget_date.currentItem()
+        if item is None:
+            QMessageBox.information(self, "Information", "No date selected")
+            return
+
+        date_editor = DateCreatorWindow(self)
+        date_editor.set_date(item.data(Qt.UserRole))
+        self.edit_pair.get_value(StudentPairAttrib.Date).remove_date(item.data(Qt.UserRole))
+        date_editor.exec_()
+
+        edit_date = date_editor.get_date()
+        self.edit_pair.get_value(StudentPairAttrib.Date).add_date(edit_date)
+        self.update_list_widget_date()
+
+    def push_button_remove_date_clicked(self):
+        item = self.list_widget_date.currentItem()
+        if item is None:
+            QMessageBox.information(self, "Information", "No date selected")
+            return
+
+        self.edit_pair.get_value(StudentPairAttrib.Date).remove_date(item.data(Qt.UserRole))
+        self.update_list_widget_date()
+
+    def update_list_widget_date(self):
+        dates = self.edit_pair.get_value(StudentPairAttrib.Date).get_dates()
+        self.list_widget_date.clear()
+        for date in dates:
+            item = QListWidgetItem(str(date))
+            item.setData(Qt.UserRole, date)
+            self.list_widget_date.addItem(item)
 
     def push_button_ok_clicked(self):
         if self.save():
