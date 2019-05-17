@@ -42,6 +42,9 @@ class SubgroupPair(AttribPair):
     def set_subgroup(self, subgroup: SubgroupPairAttrib):
         self._subgroup = subgroup
 
+    def get_subgroup(self):
+        return self._subgroup
+
     def load(self, el: Xml.Element) -> None:
         self._subgroup = SubgroupPairAttrib.value_of(el.text)
 

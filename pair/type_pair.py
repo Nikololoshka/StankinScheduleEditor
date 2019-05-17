@@ -10,6 +10,7 @@ class TypePairAttrib(Enum):
     Missing = 0
     Lecture = 1
     Seminar = 2
+    Laboratory = 3
 
     @staticmethod
     def value_of(s: str):
@@ -19,13 +20,15 @@ class TypePairAttrib(Enum):
     def items():
         return (str(TypePairAttrib.Missing), TypePairAttrib.Missing), \
                (str(TypePairAttrib.Lecture), TypePairAttrib.Lecture), \
-               (str(TypePairAttrib.Seminar), TypePairAttrib.Seminar)
+               (str(TypePairAttrib.Seminar), TypePairAttrib.Seminar), \
+               (str(TypePairAttrib.Laboratory), TypePairAttrib.Laboratory)
 
     def __str__(self):
         return {
             TypePairAttrib.Missing: "---",
             TypePairAttrib.Lecture: "Лекция",
-            TypePairAttrib.Seminar: "Семинар"
+            TypePairAttrib.Seminar: "Семинар",
+            TypePairAttrib.Laboratory: "Лабораторная работа"
         }[self]
 
 
@@ -55,4 +58,3 @@ class TypePair(AttribPair):
 
     def __str__(self):
         return str(self._type)
-

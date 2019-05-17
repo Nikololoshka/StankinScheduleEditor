@@ -101,4 +101,4 @@ if __name__ == '__main__':
         for pairs in day_of_week:
             sp = StudentPair().load(pairs)
             print(sp)
-            # print(defaults.prettify(sp.save()))
+            print(defaults.prettify(sp.save()))

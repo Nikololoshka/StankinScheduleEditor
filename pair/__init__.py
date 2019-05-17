@@ -5,7 +5,7 @@ from pair.type_pair import TypePair, TypePairAttrib
 from pair.subgroup_pair import SubgroupPair, SubgroupPairAttrib
 from pair.classroom_pair import ClassroomPair
 from pair.time_pair import TimePair
-from pair.date_pair import DatePair, DateItem, DateRange, DaysOfWeek, FrequencyDate
+from pair.date_pair import DatePair, DateItem, DateRange, DaysOfWeek, FrequencyDate, InvalidDatePair
 
 __all__ = [
     "StudentPair", "StudentPairAttrib",
@@ -15,5 +15,5 @@ __all__ = [
     "SubgroupPair", "SubgroupPairAttrib",
     "ClassroomPair",
     "TimePair",
-    "DatePair", "DateItem", "DateRange", "DaysOfWeek", "FrequencyDate"
+    "DatePair", "DateItem", "DateRange", "DaysOfWeek", "FrequencyDate", "InvalidDatePair"
 ]

@@ -272,19 +272,7 @@ class DatePair(AttribPair):
                 else:
                     date_parse = DateRange(*date_tag.text.split("-"), frequency)
 
-                if self._week_day is None:
-                    self._week_day = date_parse.get_week_day()
-                else:
-                    if self._week_day != date_parse.get_week_day():
-                        raise InvalidDatePair("Dates have a different day of the week")
-
-                i = 0
-                while i < len(self._dates):
-                    if not self._dates[i] < date_parse:
-                        break
-                    i += 1
-
-                self._dates.insert(i, date_parse)
+                self.add_date(date_parse)
 
             except KeyError:
                 raise InvalidDatePair("Could not read the \"date\", because the frequency \"{}\" is not correct"
@@ -304,6 +292,29 @@ class DatePair(AttribPair):
     def get_week_day(self) -> DaysOfWeek:
         """ Returns the day of the week date """
         return self._week_day
+
+    def add_date(self, date_item) -> None:
+        if self._week_day is None:
+            self._week_day = date_item.get_week_day()
+        else:
+            if self._week_day != date_item.get_week_day():
+                raise InvalidDatePair("Dates have a different day of the week")
+
+        i = 0
+        while i < len(self._dates):
+            if not self._dates[i] < date_item:
+                break
+            i += 1
+
+        self._dates.insert(i, date_item)
+
+    def get_dates(self) -> list:
+        return self._dates
+
+    def remove_date(self, date_item) -> None:
+        self._dates.remove(date_item)
+        if len(self._dates) == 0:
+            self._week_day = None
 
     def __eq__(self, other):
         """ Return self == other. """
@@ -380,24 +391,24 @@ if __name__ == '__main__':
     ]
 
     elem = Xml.fromstring("<dates>" + "".join(dates_lst) + "</dates>")
-    date = DatePair()
-    date.load(elem)
+    d = DatePair()
+    d.load(elem)
 
-    print("Save/Load check:", Xml.tostring(date.save()).decode("utf-8") == "<dates>" + "".join(dates_lst) + "</dates>")
-    print("Contains method check:", "2019.03.30" in date)
+    print("Save/Load check:", Xml.tostring(d.save()).decode("utf-8") == "<dates>" + "".join(dates_lst) + "</dates>")
+    print("Contains method check:", "2019.03.30" in d)
 
     correct_str = "09.02, 16.02-16.03 ч.н., 23.03-27.04 к.н., 18.05, 25.05"
 
     count = 0
     for lst in itertools.permutations(dates_lst):
         elem = Xml.fromstring("<dates>" + "".join(lst) + "</dates>")
-        date = DatePair()
-        date.load(elem)
+        d = DatePair()
+        d.load(elem)
 
-        if str(date) == correct_str:
+        if str(d) == correct_str:
             # print("cool\t", d,)
             count += 1
         else:
-            print("bad\t", date)
+            print("bad\t", d)
 
     print("Combination check: {} / 120 is correct".format(count))

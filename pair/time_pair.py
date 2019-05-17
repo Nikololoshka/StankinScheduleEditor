@@ -52,7 +52,7 @@ class TimePair(AttribPair):
 
     def save(self) -> Xml.Element:
         """ Save TimePair to XML file """
-        element = Xml.Element("time", {"count": self._count})
+        element = Xml.Element("time", {"count": str(self._count)})
 
         sub_element = Xml.SubElement(element, "start")
         sub_element.text = self._start
