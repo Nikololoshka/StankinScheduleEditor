@@ -14,12 +14,12 @@ The project is designed to create a weekly schedule in the form of pdf-files.
 
 ## Screenshots
 
-<img src="./screenshots/01.png" width="400">
+<img src="./screenshots/01.png">
 
-<img src="./screenshots/02.png" width="400">
+<img src="./screenshots/02.png">
 
-<img src="./screenshots/03.png" width="400">
+<img src="./screenshots/03.png">
 
-<img src="./screenshots/04.png" width="400">
+<img src="./screenshots/04.png">
 
-<img src="./screenshots/04.png" width="400">
+<img src="./screenshots/05.png">
