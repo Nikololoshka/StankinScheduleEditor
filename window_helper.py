@@ -8,7 +8,7 @@ from PyQt5.QtGui import *
 
 def compute_font_for_text(text: str, flags: int, size: QSize) -> QFont:
     font = qApp.font()
-    for i in range(1, 18):
+    for i in range(1, 14):
         font.setPixelSize(i)
         rect = QFontMetrics(font).boundingRect(0, 0, size.width(), size.height(), flags, text)
         if rect.width() > size.width() or rect.height() > size.height():
