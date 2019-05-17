@@ -9,6 +9,7 @@ from schedule import Schedule
 from pair import DaysOfWeek
 from window_helper import CustomHeaderView, compute_font_for_text
 from pair_selector_window import PairSelectorWindow
+from pdf_export import pdf_export
 import defaults
 
 
@@ -17,7 +18,7 @@ class ScheduleEditorWindow(QMainWindow):
         super().__init__()
 
         self.schedule = Schedule()
-        self.file = None
+        self.file= None
 
         # window settings
         self.setWindowTitle("Schedule Editor")
@@ -130,21 +131,36 @@ class ScheduleEditorWindow(QMainWindow):
         try:
             self.schedule.load(path)
             self.file = QFileInfo(path)
+            self.statusBar().showMessage("Load file: " + path, 5000)
+            self.setWindowTitle("Schedule Editor [{}]".format(self.file.absoluteFilePath()))
             self.update_table_widget()
         except Exception as e:
             QMessageBox.critical(self, "Error", str(e),)
 
     def action_save_clicked(self):
-        pass
+        if self.file is None:
+            self.action_save_as_clicked()
+        else:
+            self.schedule.save(self.file.absoluteFilePath())
+            self.setWindowTitle("Schedule Editor [{}]".format(self.file.absoluteFilePath()))
+            self.statusBar().showMessage("Save file: " + self.file.absoluteFilePath(), 5000)
 
     def action_save_as_clicked(self):
         path = QFileDialog.getSaveFileName(self, "Save schedule as xml file", "./examples", "XML file (*.xml)")[0]
+
         if path == "":
             return
-        self.schedule.save(path + ".xml")
+
+        if not path.endswith(".xml"):
+            path += ".xml"
+
+        self.schedule.save(path)
+        self.file = QFileInfo(path)
+        self.setWindowTitle("Schedule Editor [{}]".format(self.file.absoluteFilePath()))
+        self.statusBar().showMessage("Save file: " + self.file.absoluteFilePath(), 5000)
 
     def action_export_clicked(self):
-        pass
+        pdf_export.export_to_pdf(self.schedule, "2019.02.04", "2019.05.27")
 
     def action_about_clicked(self):
         pass
