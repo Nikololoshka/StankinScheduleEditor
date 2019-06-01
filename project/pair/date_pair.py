@@ -2,12 +2,9 @@
 
 # imports
 import xml.etree.ElementTree as Xml
-from pair.attrib_pair import AttribPair
+from project.pair.attrib_pair import AttribPair
 from datetime import datetime, timedelta
 from enum import Enum
-
-# debug import
-import itertools
 
 
 class DaysOfWeek(Enum):
@@ -20,6 +17,7 @@ class DaysOfWeek(Enum):
     Saturday = "saturday"
 
     def index_of(self) -> int:
+        """ Returns the day of the week in order """
         for i, day in enumerate(DaysOfWeek.__members__.values()):
             if self == day:
                 return i
@@ -37,6 +35,7 @@ class DaysOfWeek(Enum):
 
     @staticmethod
     def to_list():
+        """ Returns a list of the names of the days of the week """
         return [str(name) for name in DaysOfWeek.__members__.values()]
 
     def __str__(self) -> str:
@@ -58,6 +57,7 @@ class FrequencyDate(Enum):
 
     @staticmethod
     def value_of(s: str):
+        """ Returns the frequency of a pair by its string representation """
         return FrequencyDate.__members__[s.title()]
 
     def __str__(self):
@@ -224,6 +224,7 @@ class DateRange:
         return not self < other
 
     def __contains__(self, item):
+        """ Return key in self. """
         if self.frequency == FrequencyDate.Every:
             delta = timedelta(days=7)
         else:
@@ -250,7 +251,7 @@ class DateRange:
 
 
 class DatePair(AttribPair):
-    """ Class describing the date of student pairs """
+    """ Class describing the dates of student pairs """
     def __init__(self):
         self._dates = list()
         self._week_day = None
@@ -262,7 +263,6 @@ class DatePair(AttribPair):
         return d
 
     def load(self, el: Xml.Element) -> None:
-        """ Load DatePair from XML file """
         for date_tag in el:
             try:
                 frequency = FrequencyDate.value_of(date_tag.attrib["frequency"])
@@ -279,7 +279,6 @@ class DatePair(AttribPair):
                                       .format(date_tag.attrib["frequency"]))
 
     def save(self) -> Xml.Element:
-        """ Save DatePair to XML file """
         element = Xml.Element("dates")
         for x in self._dates:
             element.append(x.save())
@@ -294,6 +293,7 @@ class DatePair(AttribPair):
         return self._week_day
 
     def add_date(self, date_item) -> None:
+        """ Adds a date to the list of dates """
         if self._week_day is None:
             self._week_day = date_item.get_week_day()
         else:
@@ -309,9 +309,11 @@ class DatePair(AttribPair):
         self._dates.insert(i, date_item)
 
     def get_dates(self) -> list:
+        """ Returns a list of dates """
         return self._dates
 
     def remove_date(self, date_item) -> None:
+        """ Removes a date from the date list """
         self._dates.remove(date_item)
         if len(self._dates) == 0:
             self._week_day = None
@@ -359,6 +361,7 @@ class DatePair(AttribPair):
         return not self < other
 
     def __contains__(self, item):
+        """ Return item in self. """
         for x in self._dates:
             if item in x:
                 return True
@@ -373,42 +376,3 @@ class DatePair(AttribPair):
                 s += ", "
 
         return s
-
-
-if __name__ == '__main__':
-    # tests
-    try:
-        raise InvalidDatePair("The date range must have the same day of the week.")
-    except InvalidDatePair as ex:
-        print("Exception check:", ex)
-
-    dates_lst = [
-        "<date frequency=\"once\">2019.02.09</date>",
-        "<date frequency=\"throughout\">2019.02.16-2019.03.16</date>",
-        "<date frequency=\"every\">2019.03.23-2019.04.27</date>",
-        "<date frequency=\"once\">2019.05.18</date>",
-        "<date frequency=\"once\">2019.05.25</date>"
-    ]
-
-    elem = Xml.fromstring("<dates>" + "".join(dates_lst) + "</dates>")
-    d = DatePair()
-    d.load(elem)
-
-    print("Save/Load check:", Xml.tostring(d.save()).decode("utf-8") == "<dates>" + "".join(dates_lst) + "</dates>")
-    print("Contains method check:", "2019.03.30" in d)
-
-    correct_str = "09.02, 16.02-16.03 ч.н., 23.03-27.04 к.н., 18.05, 25.05"
-
-    count = 0
-    for lst in itertools.permutations(dates_lst):
-        elem = Xml.fromstring("<dates>" + "".join(lst) + "</dates>")
-        d = DatePair()
-        d.load(elem)
-
-        if str(d) == correct_str:
-            # print("cool\t", d,)
-            count += 1
-        else:
-            print("bad\t", d)
-
-    print("Combination check: {} / 120 is correct".format(count))

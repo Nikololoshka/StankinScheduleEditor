@@ -3,7 +3,7 @@
 # imports
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-from pair import DateItem, DateRange, FrequencyDate, InvalidDatePair
+from project.pair import DateItem, DateRange, FrequencyDate, InvalidDatePair
 
 
 class DateCreatorWindow(QDialog):

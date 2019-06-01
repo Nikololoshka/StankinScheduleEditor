@@ -2,11 +2,12 @@
 
 # imports
 import xml.etree.ElementTree as Xml
-from pair import StudentPair, StudentPairAttrib, DaysOfWeek
-import defaults
+from project.pair import StudentPair, StudentPairAttrib, DaysOfWeek
+from project import defaults
 
 
 class Schedule:
+    """ Class describing the schedule of pairs """
     def __init__(self):
         self.schedule_list = {
             day: {
@@ -16,12 +17,13 @@ class Schedule:
 
     @staticmethod
     def from_xml(path):
+        """ Load Schedule from XML file. Returns Schedule """
         sch = Schedule()
         sch.load(path)
         return sch
 
-    def load(self, path):
-        """ Load Schedule from XML file. Returns Schedule """
+    def load(self, path) -> None:
+        """ Load Schedule from XML file """
         tree = Xml.ElementTree(file=path)
         root = tree.getroot()
 
@@ -30,9 +32,8 @@ class Schedule:
                 pair = StudentPair.from_xml(xml_pair)
                 self.add_pair(pair)
 
-        return self
-
     def save(self, path):
+        """ Save Schedule to XML file """
         with open(path, "w") as file:
             element_schedule = Xml.Element("schedule")
             for day, times in self.schedule_list.items():
@@ -46,9 +47,11 @@ class Schedule:
             file.write(defaults.prettify(element_schedule))
 
     def pairs_by_index(self, i, j) -> list:
+        """ Returns a list of pairs in the table """
         return self.schedule_list[DaysOfWeek.value_of(i)][j]
 
     def add_pair(self, pair: StudentPair):
+        """ Adds a student pair to the schedule """
         time = pair.get_value(StudentPairAttrib.Time).get_number()
         week_day = pair.get_value(StudentPairAttrib.Date).get_week_day()
 
@@ -61,11 +64,3 @@ class Schedule:
             i += 1
 
         self.schedule_list[week_day][time].insert(i, pair)
-
-
-if __name__ == '__main__':
-    # tests
-    s = Schedule.from_xml("./examples/example.xml")
-
-    print(s)
-    print(s.pairs_by_index(0, 2))

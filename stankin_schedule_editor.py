@@ -4,7 +4,7 @@
 # imports
 import sys
 from PyQt5.QtWidgets import QApplication
-from schedule_editor_window import ScheduleEditorWindow
+from project.schedule_editor_window import ScheduleEditorWindow
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

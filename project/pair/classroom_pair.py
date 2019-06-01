@@ -2,10 +2,11 @@
 
 # imports
 from xml.etree import ElementTree as Xml
-from pair.attrib_pair import AttribPair
+from project.pair.attrib_pair import AttribPair
 
 
 class ClassroomPair(AttribPair):
+    """ Class describing the classroom pair """
     def __init__(self, s: str = ""):
         self._classroom: str = s
 
@@ -16,6 +17,7 @@ class ClassroomPair(AttribPair):
         return classroom
 
     def set_classroom(self, s: str):
+        """ Sets the value of classroom """
         self._classroom = s
 
     def load(self, el: Xml.Element) -> None:
@@ -31,8 +33,3 @@ class ClassroomPair(AttribPair):
 
     def __str__(self):
         return self._classroom
-
-
-if __name__ == '__main__':
-    t = ClassroomPair("224")
-    print(t)

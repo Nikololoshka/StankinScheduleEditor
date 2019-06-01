@@ -14,7 +14,7 @@ def prettify(elem):
 
 def get_lecturers() -> set:
     """ Returns a list of lecturers """
-    with open("./res/lecturers.txt", "r") as file:
+    with open("./project/res/lecturers.txt", "r") as file:
         return set(line for line in file)
 
 

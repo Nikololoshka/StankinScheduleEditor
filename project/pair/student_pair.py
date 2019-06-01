@@ -3,19 +3,17 @@
 # imports
 from xml.etree import ElementTree as Xml
 from enum import Enum
-from pair.title_pair import TitlePair
-from pair.lecturer_pair import LecturerPair
-from pair.type_pair import TypePair
-from pair.subgroup_pair import SubgroupPair
-from pair.classroom_pair import ClassroomPair
-from pair.time_pair import TimePair
-from pair.date_pair import DatePair
-
-# debug import
-import defaults
+from project.pair.title_pair import TitlePair
+from project.pair.lecturer_pair import LecturerPair
+from project.pair.type_pair import TypePair
+from project.pair.subgroup_pair import SubgroupPair
+from project.pair.classroom_pair import ClassroomPair
+from project.pair.time_pair import TimePair
+from project.pair.date_pair import DatePair
 
 
 class StudentPairAttrib(Enum):
+    """ Enum describing attributes of StudentPair """
     Title = "title"
     Lecturer = "lecturer"
     Type = "type"
@@ -40,12 +38,13 @@ class StudentPair:
 
     @staticmethod
     def from_xml(file: Xml.Element):
+        """ Load Pair from XML file. Returned StudentPair """
         pair = StudentPair()
         pair.load(file)
         return pair
 
     def load(self, el: Xml.Element):
-        """ Load Pair from XML file. Returns Pair """
+        """ Load StudentPair from XML file """
         self._attributes = {
             StudentPairAttrib.Title: TitlePair.from_xml_pair(el),
             StudentPairAttrib.Lecturer: LecturerPair.from_xml_pair(el),
@@ -55,10 +54,9 @@ class StudentPair:
             StudentPairAttrib.Time: TimePair.from_xml_pair(el),
             StudentPairAttrib.Date: DatePair.from_xml_pair(el)
         }
-        return self
 
     def save(self):
-        """ Save Pair to XML file """
+        """ Save StudentPair to XML file """
         element = Xml.Element("pair")
         for attrib in StudentPairAttrib:
             if self._attributes[attrib] is not None:
@@ -84,21 +82,3 @@ class StudentPair:
                     s += str(self._attributes[attrib]) + ". "
 
         return s
-
-
-if __name__ == '__main__':
-    # tests
-    tree = Xml.ElementTree(file="../examples/example.xml")
-    root = tree.getroot()
-
-    if not Xml.iselement(root):
-        print("No valid root of tree")
-        exit(-1)
-
-    print("root - tag: '{}', attrib: {}".format(root.tag, root.attrib))
-
-    for day_of_week in root:
-        for pairs in day_of_week:
-            sp = StudentPair().load(pairs)
-            print(sp)
-            print(defaults.prettify(sp.save()))

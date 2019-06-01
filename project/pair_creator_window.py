@@ -3,11 +3,11 @@
 # imports
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-from schedule import Schedule
-from pair import StudentPair, StudentPairAttrib, TypePairAttrib, \
+from project.schedule import Schedule
+from project.pair import StudentPair, StudentPairAttrib, TypePairAttrib, \
                  SubgroupPairAttrib, TimePair
-from date_creator_window import DateCreatorWindow
-import defaults
+from project.date_creator_window import DateCreatorWindow
+from project import defaults
 
 
 class PairCreatorWindow(QDialog):

@@ -2,10 +2,11 @@
 
 # imports
 from xml.etree import ElementTree as Xml
-from pair.attrib_pair import AttribPair
+from project.pair.attrib_pair import AttribPair
 
 
 class TitlePair(AttribPair):
+    """ Class describing the title pair """
     def __init__(self, s: str = ""):
         self._title: str = s
 
@@ -16,6 +17,7 @@ class TitlePair(AttribPair):
         return title
 
     def set_title(self, s: str):
+        """ Sets the value of title """
         self._title = s
 
     def load(self, el: Xml.Element) -> None:

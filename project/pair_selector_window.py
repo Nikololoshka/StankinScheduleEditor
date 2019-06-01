@@ -3,9 +3,9 @@
 # imports
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-from schedule import Schedule
-from pair import StudentPair
-from pair_creator_window import PairCreatorWindow
+from project.schedule import Schedule
+from project.pair import StudentPair
+from project.pair_creator_window import PairCreatorWindow
 
 
 class PairSelectorWindow(QDialog):

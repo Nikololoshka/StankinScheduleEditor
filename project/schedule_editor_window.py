@@ -1,24 +1,60 @@
 # coding: utf-8
 
 # imports
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PyQt5.QtWidgets import QHeaderView, QMainWindow, QTableWidget, QAbstractItemView, QSizePolicy, \
+                            QTableWidgetItem, QAction, qApp, QFileDialog, QMessageBox
+from PyQt5.QtCore import QRectF, Qt, QSize, QFileInfo, QModelIndex
+from PyQt5.QtGui import QFont, QFontMetrics, QIcon, QResizeEvent
 
-from schedule import Schedule
-from pair import DaysOfWeek
-from window_helper import CustomHeaderView, compute_font_for_text
-from pair_selector_window import PairSelectorWindow
-from pdf_export import pdf_export
-import defaults
+from project.schedule import Schedule
+from project.pair import DaysOfWeek
+from project.pair_selector_window import PairSelectorWindow
+from project import defaults, pdf_export
+
+
+def compute_font_for_text(text: str, flags: int, size: QSize) -> QFont:
+    """
+    Calculates the font for the text for the area of the specified dimensions.
+    Returns the font
+    """
+    font = qApp.font()
+    for i in range(1, 14):
+        font.setPixelSize(i)
+        rect = QFontMetrics(font).boundingRect(0, 0, size.width(), size.height(), flags, text)
+        if rect.width() > size.width() or rect.height() > size.height():
+            font.setPixelSize(i - 1)
+            break
+
+    return font
+
+
+class CustomHeaderView(QHeaderView):
+    """ HeaderView class with vertical text support """
+    def __init__(self, orientation):
+        super().__init__(orientation)
+
+    def paintSection(self, painter, rect, index):
+        painter.save()
+        if self.orientation() == Qt.Vertical:
+            painter.translate(rect.x() + rect.width(), rect.y() + rect.height())
+            painter.rotate(-90)
+            painter.drawText(QRectF(0, 0, rect.height(), -rect.width()),
+                             Qt.AlignCenter,
+                             self.model().headerData(index, self.orientation(), Qt.DisplayRole))
+        else:
+            painter.drawText(QRectF(rect.x(), rect.y(), rect.width(), rect.height()),
+                             Qt.AlignCenter,
+                             self.model().headerData(index, self.orientation(), Qt.DisplayRole))
+        painter.restore()
 
 
 class ScheduleEditorWindow(QMainWindow):
+    """ Class describing the main window of the program """
     def __init__(self):
         super().__init__()
 
         self.schedule = Schedule()
-        self.file= None
+        self.file = None
 
         # window settings
         self.setWindowTitle("Schedule Editor")
@@ -118,6 +154,7 @@ class ScheduleEditorWindow(QMainWindow):
                 self.table_widget.setItem(i, j, item)
 
     def cell_size(self, column, row) -> QSize:
+        """ Returns the size of the cell """
         return QSize(self.table_widget.columnWidth(column),
                      self.table_widget.rowHeight(row))
 

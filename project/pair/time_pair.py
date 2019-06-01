@@ -2,29 +2,33 @@
 
 # imports
 from xml.etree import ElementTree as Xml
-from pair.attrib_pair import AttribPair
-import defaults
+from project.pair.attrib_pair import AttribPair
+from project import defaults
 
 
 class TimePair(AttribPair):
-    """ Class describing the time of the pair """
+    """ Class describing the time of a student pair """
     def __init__(self):
         self._start: str = ""
         self._end: str = ""
         self._count: int = 0
 
     def set_time(self, start: str, end: str, count: int = None):
+        """ Sets the start time, end time, and number of pairs in this time period """
         self._start = start
         self._end = end
         self.set_count(count)
 
     def set_start(self, start):
+        """ Sets the start time """
         self._start = start
 
     def set_end(self, end):
+        """ Sets the end time """
         self._end = end
 
     def set_count(self, count: int = 0):
+        """ Sets the number of pairs in this time period """
         self._count = count
         if self._count is None:
             start = defaults.get_time_start().index(self._start)
@@ -67,18 +71,3 @@ class TimePair(AttribPair):
 
     def __str__(self) -> str:
         return "{} - {}".format(self._start, self._end)
-
-
-if __name__ == '__main__':
-    # tests
-    example = "<time count=\"1\">" \
-              "<start>12:20</start>" \
-              "<end>14:00</end>" \
-              "</time>"
-
-    elem = Xml.fromstring(example)
-
-    t = TimePair()
-    t.load(elem)
-    print("Save/Load check:", Xml.tostring(t.save()).decode("utf-8") == example)
-    print(t)
