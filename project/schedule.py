@@ -9,6 +9,7 @@ from project import defaults
 class Schedule:
     """ Class describing the schedule of pairs """
     def __init__(self):
+        self.change: bool = False
         self.schedule_list = {
             day: {
                 number: [] for number in range(8)
@@ -32,7 +33,7 @@ class Schedule:
                 pair = StudentPair.from_xml(xml_pair)
                 self.add_pair(pair)
 
-    def save(self, path):
+    def save(self, path) -> None:
         """ Save Schedule to XML file """
         with open(path, "w") as file:
             element_schedule = Xml.Element("schedule")
@@ -46,11 +47,22 @@ class Schedule:
 
             file.write(defaults.prettify(element_schedule))
 
+    def clear(self) -> None:
+        self.schedule_list = {
+            day: {
+                number: [] for number in range(8)
+            } for day in DaysOfWeek
+        }
+
+    def is_change(self) -> bool:
+        """ Returns True/False depending on whether there are changes in the schedule """
+        return self.change
+
     def pairs_by_index(self, i, j) -> list:
         """ Returns a list of pairs in the table """
         return self.schedule_list[DaysOfWeek.value_of(i)][j]
 
-    def add_pair(self, pair: StudentPair):
+    def add_pair(self, pair: StudentPair) -> None:
         """ Adds a student pair to the schedule """
         time = pair.get_value(StudentPairAttrib.Time).get_number()
         week_day = pair.get_value(StudentPairAttrib.Date).get_week_day()
@@ -64,3 +76,10 @@ class Schedule:
             i += 1
 
         self.schedule_list[week_day][time].insert(i, pair)
+        self.change = True
+
+    def remove_pair(self, i, j, pair: StudentPair):
+        """ Remove a student pair from schedule  """
+        pairs = self.pairs_by_index(i, j)
+        pairs.remove(pair)
+        self.change = True
