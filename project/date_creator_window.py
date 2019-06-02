@@ -1,30 +1,27 @@
 # coding: utf-8
 
 # imports
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
+from PyQt5.QtWidgets import QDialog, QWidget, QVBoxLayout, QHBoxLayout, \
+                            QCheckBox, QMessageBox, QLabel, QFormLayout, \
+                            QDateEdit, QComboBox, QPushButton
+from PyQt5.QtCore import Qt, QDate
 from project.pair import DateItem, DateRange, FrequencyDate, InvalidDatePair
 
 
 class DateCreatorWindow(QDialog):
+    """ Dialog window for creation / editing date """
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
 
         self.date = None
+        self.date_delta = 7
+        self.date_start_temp = QDate.currentDate()
 
         # window settings
         self.setWindowTitle("Date creator")
 
-        # toggle and status layout
-        self.horizontal_layout_up = QHBoxLayout()
-
-        self.slider = QSlider(Qt.Horizontal)
-        self.horizontal_layout_up.addWidget(self.slider)
-
-        self.label_status = QLabel("Simple date")
-        self.horizontal_layout_up.addWidget(self.label_status)
-
-        self.slider.setRange(0, 1)
+        # toggle and status
+        self.check_box = QCheckBox("Range date")
 
         # date layout
         self.form_layout_date = QFormLayout()
@@ -65,8 +62,8 @@ class DateCreatorWindow(QDialog):
 
         self.date_edit_end.setCalendarPopup(True)
         self.date_edit_end.setDisplayFormat('dd.MM.yyyy')
-        self.date_edit_end.setDate(QDate.currentDate().addDays(7))
-        self.date_edit_end.setDateRange(QDate.currentDate().addDays(7),
+        self.date_edit_end.setDate(QDate.currentDate().addDays(self.date_delta))
+        self.date_edit_end.setDateRange(QDate.currentDate().addDays(self.date_delta),
                                         QDate.currentDate().addDays(365))
 
         self.combo_box_frequency.addItem(str(FrequencyDate.Every), FrequencyDate.Every)
@@ -80,6 +77,9 @@ class DateCreatorWindow(QDialog):
         self.push_button_ok = QPushButton("OK")
         self.horizontal_layout_down.addWidget(self.push_button_ok)
 
+        self.push_button_apply = QPushButton("Apply")
+        self.horizontal_layout_down.addWidget(self.push_button_apply)
+
         self.push_button_cancel = QPushButton("Cancel")
         self.horizontal_layout_down.addWidget(self.push_button_cancel)
 
@@ -87,7 +87,7 @@ class DateCreatorWindow(QDialog):
         self.main_layout = QVBoxLayout()
         self.main_layout.setAlignment(Qt.AlignCenter)
 
-        self.main_layout.addLayout(self.horizontal_layout_up)
+        self.main_layout.addWidget(self.check_box)
         self.main_layout.addLayout(self.form_layout_date)
         self.main_layout.addStretch(1)
         self.main_layout.addLayout(self.horizontal_layout_down)
@@ -95,32 +95,36 @@ class DateCreatorWindow(QDialog):
         self.setLayout(self.main_layout)
 
         # connection
-        self.slider.valueChanged.connect(self.slider_value_change)
+        self.check_box.clicked.connect(self.check_box_clicked)
         self.date_edit_start.dateChanged.connect(self.date_edit_start_change)
+        self.date_edit_end.dateChanged.connect(self.date_range_validation)
+        self.combo_box_frequency.currentIndexChanged.connect(self.combo_box_frequency_changed)
         self.push_button_ok.clicked.connect(self.push_button_ok_clicked)
+        self.push_button_apply.clicked.connect(self.push_button_apply_clicked)
         self.push_button_cancel.clicked.connect(self.close)
 
         self.show_simple_date()
 
-    def set_date(self, date_item):
+    def set_date(self, date_item) -> None:
+        """ Sets the date for editing """
         if isinstance(date_item, DateItem):
             self.show_simple_date()
-            self.slider.setValue(0)
             self.date_edit_simple.setDate(QDate.fromString(date_item.date, "yyyy.MM.dd"))
             self.date = date_item
 
         if isinstance(date_item, DateRange):
             self.show_range_date()
-            self.slider.setValue(1)
             self.date_edit_start.setDate(QDate.fromString(date_item.date_from, "yyyy.MM.dd"))
             self.date_edit_end.setDate(QDate.fromString(date_item.date_to, "yyyy.MM.dd"))
             self.combo_box_frequency.setCurrentText(str(date_item.frequency))
             self.date = date_item
 
     def get_date(self) -> (DateItem, DateRange, None):
+        """ Returns the created date """
         return self.date
 
-    def show_simple_date(self):
+    def show_simple_date(self) -> None:
+        """ Switches the window to simple date editing mode """
         self.label_simple_date.setVisible(True)
         self.date_edit_simple.setVisible(True)
 
@@ -131,7 +135,8 @@ class DateCreatorWindow(QDialog):
         self.label_date_frequency.setVisible(False)
         self.combo_box_frequency.setVisible(False)
 
-    def show_range_date(self):
+    def show_range_date(self) -> None:
+        """ Switches the window to range date editing mode """
         self.label_date_start.setVisible(True)
         self.date_edit_start.setVisible(True)
         self.label_date_end.setVisible(True)
@@ -142,22 +147,68 @@ class DateCreatorWindow(QDialog):
         self.label_simple_date.setVisible(False)
         self.date_edit_simple.setVisible(False)
 
-    def date_edit_start_change(self, date: QDate):
-        self.date_edit_end.setMinimumDate(date.addDays(7))
+    def date_edit_start_change(self, date: QDate) -> None:
+        """ Slot for start date edit """
+        end_date = self.date_edit_end.date().addDays(self.date_start_temp.daysTo(date))
+        self.date_edit_end.setDateRange(date.addDays(self.date_delta),
+                                        date.addDays(365))
+        self.date_edit_end.setDate(end_date)
+        self.date_start_temp = QDate(date)
 
-    def slider_value_change(self, value: int):
-        if value == 0:
+    def combo_box_frequency_changed(self, index: int) -> None:
+        """ Slot for frequency combo box """
+        if index == 0:
+            self.date_delta = 7
+        else:
+            self.date_delta = 14
+
+        self.date_edit_end.setDateRange(self.date_edit_start.date().addDays(self.date_delta),
+                                        self.date_edit_start.date().addDays(365))
+        self.date_range_validation()
+
+    def date_range_validation(self) -> None:
+        """ Checks the correctness of the entered dates """
+        if self.date_edit_start.date().dayOfWeek() == self.date_edit_end.date().dayOfWeek():
+            if self.date_edit_start.date().daysTo(self.date_edit_end.date()) % self.date_delta == 0:
+                msg = ""
+                style = ""
+            else:
+                msg = "The number of days between dates is not a multiple of {}".format(self.date_delta)
+                style = "QDateEdit { background-color: #ff5e5e; }"
+        else:
+            msg = "Different days of the week at dates"
+            style = "QDateEdit { background-color: #ff5e5e; }"
+
+        if msg == "":
+            self.push_button_ok.setEnabled(True)
+            self.push_button_apply.setEnabled(True)
+        else:
+            self.push_button_ok.setEnabled(False)
+            self.push_button_apply.setEnabled(False)
+
+        self.date_edit_start.setStyleSheet(style)
+        self.date_edit_end.setStyleSheet(style)
+        self.date_edit_start.setToolTip(msg)
+        self.date_edit_end.setToolTip(msg)
+
+    def check_box_clicked(self, value: bool) -> None:
+        """ Slot for check box """
+        if value is False:
             # simple date
-            self.label_status.setText("Simple date")
             self.show_simple_date()
         else:
             # range date
-            self.label_status.setText("Range date")
             self.show_range_date()
 
-    def push_button_ok_clicked(self):
+    def push_button_ok_clicked(self) -> None:
+        """ Slot for ok button """
+        if self.push_button_apply_clicked():
+            self.close()
+
+    def push_button_apply_clicked(self) -> bool:
+        """ Slot for apply button """
         try:
-            if self.slider.value() == 0:
+            if self.check_box.isChecked() is False:
                 # simple date
                 self.date = DateItem(self.date_edit_simple.date().toString("yyyy.MM.dd"))
             else:
@@ -165,10 +216,11 @@ class DateCreatorWindow(QDialog):
                 self.date = DateRange(self.date_edit_start.date().toString("yyyy.MM.dd"),
                                       self.date_edit_end.date().toString("yyyy.MM.dd"),
                                       self.combo_box_frequency.currentData(Qt.UserRole))
-
-            self.close()
+            return True
         except InvalidDatePair as pair_ex:
             QMessageBox.warning(self, "Date error", str(pair_ex))
 
         except Exception as ex:
             QMessageBox.critical(self, "Unknown error", str(ex))
+
+        return False
