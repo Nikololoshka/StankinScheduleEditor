@@ -4,7 +4,7 @@
 from unittest import TestCase
 from xml.etree import ElementTree as Xml
 import itertools
-from project.pair import StudentPair, DatePair, TimePair
+from project.pair import StudentPair, DatePair, TimePair, DateItem
 # from project import defaults
 
 
@@ -47,7 +47,7 @@ class TestPair(TestCase):
                          "<dates>" + "".join(dates_lst) + "</dates>",
                          "Date load/save test failed")
 
-        self.assertIn("2019.03.30", d, "Date contains test failed")
+        self.assertIn(DateItem("2019.03.30"), d, "Date contains test failed")
 
         correct_str = "09.02, 16.02-16.03 ч.н., 23.03-27.04 к.н., 18.05, 25.05"
 
