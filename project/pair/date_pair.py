@@ -31,7 +31,7 @@ class DaysOfWeek(Enum):
             if i == index:
                 return day
 
-        return None
+        raise InvalidDatePair("Wrong day of the week")
 
     @staticmethod
     def to_list():
@@ -74,7 +74,7 @@ class InvalidDatePair(Exception):
         self._msg = msg
 
     def __str__(self):
-        return "InvalidDatePair: {}".format(self._msg)
+        return self._msg
 
 
 class DateItem:
@@ -149,10 +149,17 @@ class DateItem:
         return not self < other
 
     def __contains__(self, item):
-        if item == self.date:
-            return True
+        if isinstance(item, DateItem):
+            if item == self:
+                return True
 
-        return False
+            return False
+
+        if isinstance(item, DateRange):
+            return self in item
+
+        raise InvalidDatePair("Impossible to compare: {} with {}"
+                              .format(self.__class__.__name__, item.__class__.__name__))
 
     def __str__(self) -> str:
         return DateItem.compact_date(self.date)
@@ -225,24 +232,37 @@ class DateRange:
 
     def __contains__(self, item):
         """ Return key in self. """
-        if self.frequency == FrequencyDate.Every:
-            delta = timedelta(days=7)
-        else:
-            delta = timedelta(days=14)
+        if isinstance(item, DateItem):
+            if self.frequency == FrequencyDate.Every:
+                delta = timedelta(days=7)
+            elif self.frequency == FrequencyDate.Throughout:
+                delta = timedelta(days=14)
+            else:
+                raise InvalidDatePair("Incorrect \"frequency\" values for the date")
 
-        start = datetime.strptime(self.date_from, "%Y.%m.%d")
-        end = datetime.strptime(self.date_to, "%Y.%m.%d")
+            start = datetime.strptime(self.date_from, "%Y.%m.%d")
+            end = datetime.strptime(self.date_to, "%Y.%m.%d")
 
-        while True:
-            if item == start.strftime("%Y.%m.%d"):
-                return True
+            while True:
+                if item == DateItem(start.strftime("%Y.%m.%d")):
+                    return True
 
-            start += delta
+                start += delta
 
-            if start > end:
-                break
+                if start > end:
+                    break
 
-        return False
+            return False
+
+        if isinstance(item, DateRange):
+            if item.date_from > self.date_from and item.date_from > self.date_to or \
+                    item.date_to < self.date_from and item.date_to < self.date_to:
+                return False
+
+            return True
+
+        raise InvalidDatePair("Impossible to compare: {} with {}"
+                              .format(self.__class__.__name__, item.__class__.__name__))
 
     def __str__(self):
         return "{}-{} {}".format(DateItem.compact_date(self.date_from),
@@ -299,6 +319,9 @@ class DatePair(AttribPair):
         else:
             if self._week_day != date_item.get_week_day():
                 raise InvalidDatePair("Dates have a different day of the week")
+
+        if date_item in self:
+            raise InvalidDatePair("Date crosses existing dates")
 
         i = 0
         while i < len(self._dates):
