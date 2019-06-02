@@ -4,8 +4,8 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from project.schedule import Schedule
-from project.pair import StudentPair
 from project.pair_creator_window import PairCreatorWindow
+import copy
 
 
 class PairSelectorWindow(QDialog):
@@ -19,7 +19,7 @@ class PairSelectorWindow(QDialog):
         self.index = index
 
         # window settings
-        self.setWindowTitle("Selector")
+        self.setWindowTitle(self.tr("Selector"))
         self.setMinimumSize(500, 300)
 
         # build and layout settings
@@ -32,16 +32,16 @@ class PairSelectorWindow(QDialog):
         horizontal_layout.addWidget(self.list_widget)
         vertical_layout = QVBoxLayout()
 
-        self.push_button_new = QPushButton("New", self)
+        self.push_button_new = QPushButton(self.tr("New"), self)
         vertical_layout.addWidget(self.push_button_new)
 
-        self.push_button_edit = QPushButton("Edit", self)
+        self.push_button_edit = QPushButton(self.tr("Edit"), self)
         vertical_layout.addWidget(self.push_button_edit)
 
-        self.push_button_remove = QPushButton("Remove", self)
+        self.push_button_remove = QPushButton(self.tr("Remove"), self)
         vertical_layout.addWidget(self.push_button_remove)
 
-        self.push_button_cancel = QPushButton("Cancel", self)
+        self.push_button_cancel = QPushButton(self.tr("Cancel"), self)
         vertical_layout.addWidget(self.push_button_cancel)
 
         vertical_layout.addStretch(1)
@@ -68,39 +68,53 @@ class PairSelectorWindow(QDialog):
 
     def remove_pair(self, item):
         remove_pair = item.data(Qt.UserRole)
-        pairs = self.scheduler_ref.pairs_by_index(self.index.row(), self.index.column())
-        pairs.remove(remove_pair)
+        self.scheduler_ref.remove_pair(self.index.row(), self.index.column(), remove_pair)
 
     def push_button_new_clicked(self):
-        new_pair = StudentPair()
-        creator = PairCreatorWindow(self.scheduler_ref, self.index, new_pair, self)
-        creator.pairChanged.connect(self.update_pairs_list)
-        creator.exec_()
-
-        if creator.is_change():
-            self.scheduler_ref.add_pair(new_pair)
-            self.update_pairs_list()
+        creator = PairCreatorWindow(self.scheduler_ref, self.index, self)
+        while True:
+            creator.exec_()
+            new_pair = creator.get_pair()
+            if new_pair is not None:
+                try:
+                    self.scheduler_ref.add_pair(new_pair)
+                    self.update_pairs_list()
+                    break
+                except Exception as ex:
+                    QMessageBox.critical(self, self.tr("Invalid pair"), str(ex))
+            else:
+                break
 
     def push_button_edit_clicked(self):
         item = self.list_widget.currentItem()
         if item is None:
-            QMessageBox.information(self, "Information", "No pair selected")
+            QMessageBox.information(self, self.tr("Information"), self.tr("No pair selected"))
             return
 
-        edit_pair = item.data(Qt.UserRole)
+        origin_pair = item.data(Qt.UserRole)
         self.remove_pair(item)
 
-        creator = PairCreatorWindow(self.scheduler_ref, self.index, edit_pair, self)
-        creator.pairChanged.connect(self.update_pairs_list)
-        creator.exec_()
+        creator = PairCreatorWindow(self.scheduler_ref, self.index, self)
+        creator.set_pair(copy.deepcopy(origin_pair))
 
-        self.scheduler_ref.add_pair(edit_pair)
-        self.update_pairs_list()
+        while True:
+            creator.exec_()
+            edit_pair = creator.get_pair()
+            if edit_pair is not None:
+                try:
+                    self.scheduler_ref.add_pair(edit_pair)
+                    self.update_pairs_list()
+                    break
+                except Exception as ex:
+                    QMessageBox.critical(self, self.tr("Invalid pair"), str(ex))
+            else:
+                self.scheduler_ref.add_pair(origin_pair)
+                break
 
     def push_button_remove_clicked(self):
         item = self.list_widget.currentItem()
         if item is None:
-            QMessageBox.information(self, "Information", "No pair selected")
+            QMessageBox.information(self, self.tr("Information"), self.tr("No pair selected"))
             return
 
         self.remove_pair(item)
