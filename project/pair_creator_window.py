@@ -1,17 +1,19 @@
 # coding: utf-8
 
 # imports
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
+from PyQt5.QtWidgets import QDialog, QWidget, QFormLayout, QLineEdit, QLabel, QCompleter, QComboBox, \
+                            QGroupBox, QListWidget, QHBoxLayout, QVBoxLayout, QPushButton, \
+                            QMessageBox, QListWidgetItem
+from PyQt5.QtCore import pyqtSignal, QModelIndex, Qt
 from project.schedule import Schedule
 from project.pair import StudentPair, StudentPairAttrib, TypePairAttrib, \
-                 SubgroupPairAttrib, TimePair
+                         SubgroupPairAttrib, TimePair
 from project.date_creator_window import DateCreatorWindow
 from project import defaults
 
 
 class PairCreatorWindow(QDialog):
-
+    """ Dialog window for creating a student pair """
     pairChanged = pyqtSignal()
 
     def __init__(self, scheduler_ref: Schedule, index: QModelIndex, edit_pair: StudentPair, parent: QWidget = None):
@@ -28,7 +30,8 @@ class PairCreatorWindow(QDialog):
         self.resize(800, 400)
 
         # general settings window
-        self.form_layout_general = QFormLayout()
+        self.group_box_general = QGroupBox("General", self)
+        self.form_layout_general = QFormLayout(self.group_box_general)
 
         # title
         self.label_title = QLabel("Title", self)
@@ -136,7 +139,7 @@ class PairCreatorWindow(QDialog):
 
         # layout settings
         self.vertical_layout_left = QVBoxLayout()
-        self.vertical_layout_left.addLayout(self.form_layout_general)
+        self.vertical_layout_left.addWidget(self.group_box_general)
         self.vertical_layout_left.addWidget(self.group_box_time)
 
         self.horizontal_layout_up = QHBoxLayout()
@@ -151,6 +154,7 @@ class PairCreatorWindow(QDialog):
 
         # connection
         self.combo_box_start.currentIndexChanged.connect(self.combo_box_start_changed)
+        self.list_widget_date.itemDoubleClicked.connect(self.push_button_edit_date_clicked)
         self.push_button_add_date.clicked.connect(self.push_button_add_date_clicked)
         self.push_button_edit_date.clicked.connect(self.push_button_edit_date_clicked)
         self.push_button_remove_date.clicked.connect(self.push_button_remove_date_clicked)
@@ -158,6 +162,10 @@ class PairCreatorWindow(QDialog):
         self.push_button_cancel.clicked.connect(self.close)
 
     def save(self) -> bool:
+        """
+        Saves the created / edited a student pair.
+        Returns true/false depending on whether the save was successful or not.
+        """
         title = self.line_edit_title.text().strip()
         if title == "":
             QMessageBox.information(self, "Information", "Title field is empty")
@@ -191,9 +199,11 @@ class PairCreatorWindow(QDialog):
         return True
 
     def is_change(self):
+        """ Returns True if there were changes to the pair, otherwise False """
         return self._change
 
     def push_button_add_date_clicked(self):
+        """ Slot for add date button """
         date_creator = DateCreatorWindow(self)
         date_creator.exec_()
         create_date = date_creator.get_date()
@@ -202,6 +212,7 @@ class PairCreatorWindow(QDialog):
             self.update_list_widget_date()
 
     def push_button_edit_date_clicked(self):
+        """ Slot for edit date button """
         item = self.list_widget_date.currentItem()
         if item is None:
             QMessageBox.information(self, "Information", "No date selected")
@@ -217,6 +228,7 @@ class PairCreatorWindow(QDialog):
         self.update_list_widget_date()
 
     def push_button_remove_date_clicked(self):
+        """ Slot for remove date button """
         item = self.list_widget_date.currentItem()
         if item is None:
             QMessageBox.information(self, "Information", "No date selected")
@@ -226,6 +238,7 @@ class PairCreatorWindow(QDialog):
         self.update_list_widget_date()
 
     def update_list_widget_date(self):
+        """ Updates the list of dates in the window """
         dates = self.edit_pair.get_value(StudentPairAttrib.Date).get_dates()
         self.list_widget_date.clear()
         for date in dates:
@@ -234,8 +247,10 @@ class PairCreatorWindow(QDialog):
             self.list_widget_date.addItem(item)
 
     def push_button_ok_clicked(self):
+        """ Slot for ok button """
         if self.save():
             self.close()
 
     def combo_box_start_changed(self, index):
+        """ Slot for time change combo_box_end """
         self.combo_box_end.setCurrentIndex(index)
