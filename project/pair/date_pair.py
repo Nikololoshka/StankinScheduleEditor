@@ -1,6 +1,7 @@
 # coding: utf-8
 
 # imports
+from PyQt5.QtCore import QObject, QT_TR_NOOP_UTF8
 import xml.etree.ElementTree as Xml
 from project.pair.attrib_pair import AttribPair
 from datetime import datetime, timedelta
@@ -40,12 +41,12 @@ class DaysOfWeek(Enum):
 
     def __str__(self) -> str:
         return {
-            DaysOfWeek.Monday: "Понедельник",
-            DaysOfWeek.Tuesday: "Вторник",
-            DaysOfWeek.Wednesday: "Среда",
-            DaysOfWeek.Thursday: "Четверг",
-            DaysOfWeek.Friday: "Пятница",
-            DaysOfWeek.Saturday: "Суббота"
+            DaysOfWeek.Monday: QT_TR_NOOP_UTF8("Понедельник"),
+            DaysOfWeek.Tuesday: QT_TR_NOOP_UTF8("Вторник"),
+            DaysOfWeek.Wednesday: QT_TR_NOOP_UTF8("Среда"),
+            DaysOfWeek.Thursday: QT_TR_NOOP_UTF8("Четверг"),
+            DaysOfWeek.Friday: QT_TR_NOOP_UTF8("Пятница"),
+            DaysOfWeek.Saturday: QT_TR_NOOP_UTF8("Суббота")
         }[self]
 
 
@@ -62,9 +63,9 @@ class FrequencyDate(Enum):
 
     def __str__(self):
         return {
-            FrequencyDate.Once: "",
-            FrequencyDate.Every: "к.н.",
-            FrequencyDate.Throughout: "ч.н."
+            FrequencyDate.Once: QT_TR_NOOP_UTF8(""),
+            FrequencyDate.Every: QT_TR_NOOP_UTF8("к.н."),
+            FrequencyDate.Throughout: QT_TR_NOOP_UTF8("ч.н.")
         }[self]
 
 
@@ -100,6 +101,10 @@ class DateItem:
         """ Returns the day of the week date """
         index_day = datetime.strptime(self.date, "%Y.%m.%d").weekday()
         return DaysOfWeek.value_of(index_day)
+
+    def copy(self):
+        new_date = DateItem(self.date)
+        return new_date
 
     def __eq__(self, other):
         """ Return self == other. """
@@ -182,6 +187,12 @@ class DateRange:
         """ Returns the day of the week date """
         index_day = datetime.strptime(self.date_from, "%Y.%m.%d").weekday()
         return DaysOfWeek.value_of(index_day)
+
+    def copy(self):
+        new_date = DateRange(self.date_from,
+                             self.date_to,
+                             self.frequency)
+        return new_date
 
     def __eq__(self, other):
         """ Return self == other. """
@@ -273,6 +284,7 @@ class DateRange:
 class DatePair(AttribPair):
     """ Class describing the dates of student pairs """
     def __init__(self):
+        super().__init__()
         self._dates = list()
         self._week_day = None
 
@@ -318,10 +330,10 @@ class DatePair(AttribPair):
             self._week_day = date_item.get_week_day()
         else:
             if self._week_day != date_item.get_week_day():
-                raise InvalidDatePair("Dates have a different day of the week")
+                raise InvalidDatePair(self.tr("Dates have a different day of the week"))
 
         if date_item in self:
-            raise InvalidDatePair("Date crosses existing dates")
+            raise InvalidDatePair(self.tr("Date crosses existing dates"))
 
         i = 0
         while i < len(self._dates):
@@ -331,15 +343,22 @@ class DatePair(AttribPair):
 
         self._dates.insert(i, date_item)
 
-    def get_dates(self) -> list:
-        """ Returns a list of dates """
-        return self._dates
-
     def remove_date(self, date_item) -> None:
         """ Removes a date from the date list """
         self._dates.remove(date_item)
         if len(self._dates) == 0:
             self._week_day = None
+
+    def copy(self):
+        new_dates = DatePair()
+        for date in self:
+            new_dates.add_date(date.copy())
+
+        return new_dates
+
+    def __iter__(self) -> (DateItem, DateRange):
+        for date in self._dates:
+            yield date
 
     def __eq__(self, other):
         """ Return self == other. """
@@ -386,7 +405,7 @@ class DatePair(AttribPair):
     def __contains__(self, item):
         """ Return item in self. """
         for x in self._dates:
-            if item in x:
+            if x in item:
                 return True
 
         return False
