@@ -7,10 +7,11 @@ from PyQt5.QtWidgets import QHeaderView, QMainWindow, QTableWidget, QAbstractIte
 from PyQt5.QtCore import QRectF, Qt, QSize, QFileInfo, QPoint
 from PyQt5.QtGui import QFont, QFontMetrics, QIcon, QResizeEvent
 
+from project.pair_selector_window import PairSelectorWindow
+from project.export_window import ExportWindow
 from project.schedule import Schedule
 from project.pair import DaysOfWeek
-from project.pair_selector_window import PairSelectorWindow
-from project import defaults, pdf_export
+from project import defaults
 
 
 def compute_font_for_text(text: str, flags: int, size: QSize) -> QFont:
@@ -242,7 +243,8 @@ class ScheduleEditorWindow(QMainWindow):
 
     def action_export_clicked(self) -> None:
         """ Slot for schedule export to PDF """
-        pdf_export.export_to_pdf(self.schedule, "2019.02.04", "2019.05.27")
+        exporter = ExportWindow(self.schedule)
+        exporter.exec_()
 
     def action_about_clicked(self) -> None:
         """ Slot display window: "About program" """
