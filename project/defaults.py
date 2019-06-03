@@ -5,7 +5,7 @@ from xml.etree import ElementTree
 from xml.dom import minidom
 
 
-def prettify(elem):
+def prettify(elem) -> str:
     """ Return a pretty-printed XML string for the Element. """
     rough_string = ElementTree.tostring(elem, encoding='utf-8')
     parse = minidom.parseString(rough_string)
@@ -14,7 +14,7 @@ def prettify(elem):
 
 def get_lecturers() -> set:
     """ Returns a list of lecturers """
-    with open("./project/res/lecturers.txt", "r", encoding="utf-8") as file:
+    with open("./res/lecturers.txt", "r", encoding="utf-8") as file:
         return set(line for line in file)
 
 
