@@ -9,6 +9,7 @@ from project import defaults
 class TimePair(AttribPair):
     """ Class describing the time of a student pair """
     def __init__(self):
+        super().__init__()
         self._start: str = ""
         self._end: str = ""
         self._count: int = 0
@@ -65,6 +66,11 @@ class TimePair(AttribPair):
         sub_element.text = self._end
 
         return element
+
+    def copy(self):
+        new_time = TimePair()
+        new_time.set_time(self._start, self._end, self._count)
+        return new_time
 
     def is_valid(self) -> bool:
         return self._start != "" and self._end != ""

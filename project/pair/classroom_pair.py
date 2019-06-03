@@ -8,6 +8,7 @@ from project.pair.attrib_pair import AttribPair
 class ClassroomPair(AttribPair):
     """ Class describing the classroom pair """
     def __init__(self, s: str = ""):
+        super().__init__()
         self._classroom: str = s
 
     @staticmethod
@@ -16,7 +17,7 @@ class ClassroomPair(AttribPair):
         classroom.load(file.find("classroom"))
         return classroom
 
-    def set_classroom(self, s: str):
+    def set_classroom(self, s: str) -> None:
         """ Sets the value of classroom """
         self._classroom = s
 
@@ -27,6 +28,10 @@ class ClassroomPair(AttribPair):
         element = Xml.Element("classroom")
         element.text = self._classroom
         return element
+
+    def copy(self):
+        new_classroom = ClassroomPair(self._classroom)
+        return new_classroom
 
     def is_valid(self) -> bool:
         return self._classroom != ""

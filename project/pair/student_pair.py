@@ -72,6 +72,13 @@ class StudentPair:
         """ Returned value pair by attrib """
         return self._attributes[attrib]
 
+    def copy(self):
+        new_pair = StudentPair()
+        for attrib in StudentPairAttrib:
+            new_pair._attributes[attrib] = self._attributes[attrib].copy()
+
+        return new_pair
+
     def __str__(self):
         s = ""
         for attrib in StudentPairAttrib:

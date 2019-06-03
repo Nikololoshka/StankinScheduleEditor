@@ -1,6 +1,7 @@
 # coding: utf-8
 
 # imports
+from PyQt5.QtCore import QT_TR_NOOP_UTF8
 from xml.etree import ElementTree as Xml
 from enum import Enum
 from project.pair.attrib_pair import AttribPair
@@ -27,14 +28,15 @@ class SubgroupPairAttrib(Enum):
     def __str__(self):
         return {
             SubgroupPairAttrib.Common: "---",
-            SubgroupPairAttrib.A: "(А)",
-            SubgroupPairAttrib.B: "(Б)"
+            SubgroupPairAttrib.A: QT_TR_NOOP_UTF8("(А)"),
+            SubgroupPairAttrib.B: QT_TR_NOOP_UTF8("(Б)")
         }[self]
 
 
 class SubgroupPair(AttribPair):
     """ Class describing the subgroup of a student pair """
     def __init__(self, subgroup: SubgroupPairAttrib = SubgroupPairAttrib.Common):
+        super().__init__()
         self._subgroup: SubgroupPairAttrib = subgroup
 
     @staticmethod
@@ -51,6 +53,14 @@ class SubgroupPair(AttribPair):
         """ Returns the value of subgroup """
         return self._subgroup
 
+    def is_separate(self):
+        """ Returns True/False depending on whether the student pair is separate by subgroup """
+        if self._subgroup == SubgroupPairAttrib.A or \
+                self._subgroup == SubgroupPairAttrib.B:
+            return True
+
+        return False
+
     def load(self, el: Xml.Element) -> None:
         self._subgroup = SubgroupPairAttrib.value_of(el.text)
 
@@ -58,6 +68,10 @@ class SubgroupPair(AttribPair):
         element = Xml.Element("subgroup")
         element.text = self._subgroup.name
         return element
+
+    def copy(self):
+        new_subgroup = SubgroupPair(self._subgroup)
+        return new_subgroup
 
     def is_valid(self) -> bool:
         return self._subgroup is not SubgroupPairAttrib.Common

@@ -1,6 +1,7 @@
 # coding: utf-8
 
 # imports
+from PyQt5.QtCore import QT_TR_NOOP_UTF8
 from xml.etree import ElementTree as Xml
 from enum import Enum
 from project.pair.attrib_pair import AttribPair
@@ -29,15 +30,16 @@ class TypePairAttrib(Enum):
     def __str__(self):
         return {
             TypePairAttrib.Missing: "---",
-            TypePairAttrib.Lecture: "Лекция",
-            TypePairAttrib.Seminar: "Семинар",
-            TypePairAttrib.Laboratory: "Лабораторная работа"
+            TypePairAttrib.Lecture: QT_TR_NOOP_UTF8("Лекция"),
+            TypePairAttrib.Seminar: QT_TR_NOOP_UTF8("Семинар"),
+            TypePairAttrib.Laboratory: QT_TR_NOOP_UTF8("Лабораторная работа")
         }[self]
 
 
 class TypePair(AttribPair):
     """  Class describing the type of a student pair """
     def __init__(self, t: TypePairAttrib = TypePairAttrib.Missing):
+        super().__init__()
         self._type: TypePairAttrib = t
 
     @staticmethod
@@ -57,6 +59,10 @@ class TypePair(AttribPair):
         element = Xml.Element("type")
         element.text = self._type.name
         return element
+
+    def copy(self):
+        new_type = TypePair(self._type)
+        return new_type
 
     def is_valid(self) -> bool:
         return self._type is not TypePairAttrib.Missing
