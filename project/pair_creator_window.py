@@ -5,137 +5,138 @@ from PyQt5.QtWidgets import QDialog, QWidget, QFormLayout, QLineEdit, QLabel, QC
                             QGroupBox, QListWidget, QHBoxLayout, QVBoxLayout, QPushButton, \
                             QMessageBox, QListWidgetItem, QComboBox
 from PyQt5.QtCore import QModelIndex, Qt
-from project.schedule import Schedule
 from project.pair import StudentPair, StudentPairAttrib, TypePairAttrib, \
-                         SubgroupPairAttrib, TimePair, InvalidDatePair
+                         SubgroupPairAttrib, TimePair, DatePair, InvalidDatePair
 from project.date_creator_window import DateCreatorWindow
 from project import defaults
-import copy
 
 
 class PairCreatorWindow(QDialog):
     """ Dialog window for creating a student pair """
-    def __init__(self, scheduler_ref: Schedule, index: QModelIndex, parent: QWidget = None):
+    def __init__(self, index: QModelIndex, parent: QWidget = None):
         super().__init__(parent)
 
-        self._scheduler_ref: Schedule = scheduler_ref
         self._index: QModelIndex = index
-        self._edit_pair = StudentPair()
+        self._edit_pair = None
+        self._dates = DatePair()
 
         # window settings
-        self.setWindowTitle("Creator")
+        self.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
+        self.setWindowTitle(self.tr("Creator"))
         self.setMinimumSize(640, 350)
         self.resize(800, 400)
 
         # general settings window
-        self.group_box_general = QGroupBox(self.tr("General"), self)
-        self.form_layout_general = QFormLayout(self.group_box_general)
+        self.group_box_general = QGroupBox(self.tr("General"))
+        self.layout_general = QFormLayout(self.group_box_general)
 
         # title
-        self.label_title = QLabel(self.tr("Title"), self)
-        self.form_layout_general.setWidget(0, QFormLayout.LabelRole, self.label_title)
-        self.line_edit_title = QLineEdit("", self)
-        self.form_layout_general.setWidget(0, QFormLayout.FieldRole, self.line_edit_title)
+        self.label_title = QLabel(self.tr("Title"))
+        self.layout_general.setWidget(0, QFormLayout.LabelRole, self.label_title)
+        self.line_edit_title = QLineEdit("")
+        self.layout_general.setWidget(0, QFormLayout.FieldRole, self.line_edit_title)
 
         # lecturer
-        self.label_lecturer = QLabel(self.tr("Lecturer"), self)
-        self.form_layout_general.setWidget(1, QFormLayout.LabelRole, self.label_lecturer)
-        self.line_edit_lecturer = QLineEdit("", self)
-        self.form_layout_general.setWidget(1, QFormLayout.FieldRole, self.line_edit_lecturer)
+        self.label_lecturer = QLabel(self.tr("Lecturer"))
+        self.layout_general.setWidget(1, QFormLayout.LabelRole, self.label_lecturer)
+        self.line_edit_lecturer = QLineEdit("")
+        self.layout_general.setWidget(1, QFormLayout.FieldRole, self.line_edit_lecturer)
 
-        self.completer = QCompleter(defaults.get_lecturers(), self)
+        self.completer = QCompleter(defaults.get_lecturers())
         self.completer.setCaseSensitivity(Qt.CaseInsensitive)
         self.completer.setFilterMode(Qt.MatchContains)
         self.line_edit_lecturer.setCompleter(self.completer)
 
         # type
-        self.label_type = QLabel(self.tr("Type"), self)
-        self.form_layout_general.setWidget(2, QFormLayout.LabelRole, self.label_type)
-        self.combo_box_type = QComboBox(self)
-        self.form_layout_general.setWidget(2, QFormLayout.FieldRole, self.combo_box_type)
+        self.label_type = QLabel(self.tr("Type"))
+        self.layout_general.setWidget(2, QFormLayout.LabelRole, self.label_type)
+        self.combo_box_type = QComboBox()
+        self.layout_general.setWidget(2, QFormLayout.FieldRole, self.combo_box_type)
 
         for name, attrib in TypePairAttrib.items():
             self.combo_box_type.addItem(name, attrib)
 
         # classes
-        self.label_classes = QLabel(self.tr("Classes"), self)
-        self.form_layout_general.setWidget(3, QFormLayout.LabelRole, self.label_classes)
-        self.line_edit_classes = QLineEdit("", self)
-        self.form_layout_general.setWidget(3, QFormLayout.FieldRole, self.line_edit_classes)
+        self.label_classes = QLabel(self.tr("Classes"))
+        self.layout_general.setWidget(3, QFormLayout.LabelRole, self.label_classes)
+        self.line_edit_classes = QLineEdit("")
+        self.layout_general.setWidget(3, QFormLayout.FieldRole, self.line_edit_classes)
 
         # subgroup
-        self.label_subgroup = QLabel(self.tr("Subgroup"), self)
-        self.form_layout_general.setWidget(4, QFormLayout.LabelRole, self.label_subgroup)
-        self.combo_box_subgroup = QComboBox(self)
-        self.form_layout_general.setWidget(4, QFormLayout.FieldRole, self.combo_box_subgroup)
+        self.label_subgroup = QLabel(self.tr("Subgroup"))
+        self.layout_general.setWidget(4, QFormLayout.LabelRole, self.label_subgroup)
+        self.combo_box_subgroup = QComboBox()
+        self.layout_general.setWidget(4, QFormLayout.FieldRole, self.combo_box_subgroup)
 
         for name, attrib in SubgroupPairAttrib.items():
             self.combo_box_subgroup.addItem(name, attrib)
 
         # time setting
-        self.group_box_time = QGroupBox(self.tr("Time"), self)
-        self.form_layout_time = QFormLayout(self.group_box_time)
+        self.group_box_time = QGroupBox(self.tr("Time"))
+        self.layout_time = QFormLayout(self.group_box_time)
 
-        self.label_start = QLabel(self.tr("Start"), self.group_box_time)
-        self.form_layout_time.setWidget(0, QFormLayout.LabelRole, self.label_start)
-        self.combo_box_start = QComboBox(self.group_box_time)
-        self.form_layout_time.setWidget(0, QFormLayout.FieldRole, self.combo_box_start)
+        self.label_start = QLabel(self.tr("Start"))
+        self.layout_time.setWidget(0, QFormLayout.LabelRole, self.label_start)
+        self.combo_box_start = QComboBox()
+        self.layout_time.setWidget(0, QFormLayout.FieldRole, self.combo_box_start)
 
-        self.label_end = QLabel(self.tr("End"), self.group_box_time)
-        self.form_layout_time.setWidget(1, QFormLayout.LabelRole, self.label_end)
-        self.combo_box_end = QComboBox(self.group_box_time)
-        self.form_layout_time.setWidget(1, QFormLayout.FieldRole, self.combo_box_end)
+        self.label_end = QLabel(self.tr("End"))
+        self.layout_time.setWidget(1, QFormLayout.LabelRole, self.label_end)
+        self.combo_box_end = QComboBox()
+        self.layout_time.setWidget(1, QFormLayout.FieldRole, self.combo_box_end)
 
         self.combo_box_start.addItems(defaults.get_time_start())
+        self.combo_box_start.setCurrentIndex(self._index.column())
         self.combo_box_end.addItems(defaults.get_time_end())
+        self.combo_box_end.setCurrentIndex(self._index.column())
         self.combo_box_end.setEnabled(False)
 
         # date setting
-        self.group_box_date = QGroupBox(self.tr("Date"), self)
-        self.horizontal_layout_right = QHBoxLayout(self.group_box_date)
+        self.group_box_date = QGroupBox(self.tr("Date"))
+        self.layout_date_edit = QHBoxLayout(self.group_box_date)
 
         self.list_widget_date = QListWidget(self.group_box_date)
-        self.horizontal_layout_right.addWidget(self.list_widget_date)
+        self.layout_date_edit.addWidget(self.list_widget_date)
 
-        self.vertical_layout_right = QVBoxLayout()
-        self.horizontal_layout_right.addLayout(self.vertical_layout_right)
+        self.layout_date_edit_navigate = QVBoxLayout()
+        self.layout_date_edit.addLayout(self.layout_date_edit_navigate)
 
-        self.push_button_add_date = QPushButton(self.tr("Add"), self)
-        self.vertical_layout_right.addWidget(self.push_button_add_date)
+        self.push_button_add_date = QPushButton(self.tr("Add"))
+        self.layout_date_edit_navigate.addWidget(self.push_button_add_date)
 
-        self.push_button_edit_date = QPushButton(self.tr("Edit"), self)
-        self.vertical_layout_right.addWidget(self.push_button_edit_date)
+        self.push_button_edit_date = QPushButton(self.tr("Edit"))
+        self.layout_date_edit_navigate.addWidget(self.push_button_edit_date)
 
-        self.push_button_remove_date = QPushButton(self.tr("Remove"), self)
-        self.vertical_layout_right.addWidget(self.push_button_remove_date)
+        self.push_button_remove_date = QPushButton(self.tr("Remove"))
+        self.layout_date_edit_navigate.addWidget(self.push_button_remove_date)
 
-        self.vertical_layout_right.addStretch(1)
+        self.layout_date_edit_navigate.addStretch(1)
 
         # navigate
-        self.horizontal_layout_down = QHBoxLayout()
+        self.layout_navigate = QHBoxLayout()
 
-        self.horizontal_layout_down.addStretch(1)
+        self.layout_navigate.addStretch(1)
 
-        self.push_button_ok = QPushButton(self.tr("OK"), self)
-        self.horizontal_layout_down.addWidget(self.push_button_ok)
+        self.push_button_ok = QPushButton(self.tr("OK"))
+        self.layout_navigate.addWidget(self.push_button_ok)
 
-        self.push_button_cancel = QPushButton(self.tr("Cancel"), self)
-        self.horizontal_layout_down.addWidget(self.push_button_cancel)
+        self.push_button_cancel = QPushButton(self.tr("Cancel"))
+        self.layout_navigate.addWidget(self.push_button_cancel)
 
         # layout settings
-        self.vertical_layout_left = QVBoxLayout()
-        self.vertical_layout_left.addWidget(self.group_box_general)
-        self.vertical_layout_left.addWidget(self.group_box_time)
+        self.layout_general_time = QVBoxLayout()
+        self.layout_general_time.addWidget(self.group_box_general)
+        self.layout_general_time.addWidget(self.group_box_time)
 
-        self.horizontal_layout_up = QHBoxLayout()
-        self.horizontal_layout_up.addLayout(self.vertical_layout_left)
-        self.horizontal_layout_up.addWidget(self.group_box_date)
+        self.layout_center = QHBoxLayout()
+        self.layout_center.addLayout(self.layout_general_time)
+        self.layout_center.addWidget(self.group_box_date)
 
-        self.main_layout = QVBoxLayout()
-        self.main_layout.addLayout(self.horizontal_layout_up)
-        self.main_layout.addLayout(self.horizontal_layout_down)
+        self.layout_main = QVBoxLayout()
+        self.layout_main.addLayout(self.layout_center)
+        self.layout_main.addLayout(self.layout_navigate)
 
-        self.setLayout(self.main_layout)
+        self.setLayout(self.layout_main)
 
         # connection
         self.combo_box_start.currentIndexChanged.connect(self.combo_box_start_changed)
@@ -184,12 +185,17 @@ class PairCreatorWindow(QDialog):
                                     self.tr("No dates"))
             return False
 
-        self._edit_pair.get_value(StudentPairAttrib.Title).set_title(title)
-        self._edit_pair.get_value(StudentPairAttrib.Lecturer).set_lecturer(lecturer)
-        self._edit_pair.get_value(StudentPairAttrib.Type).set_type(pair_type)
-        self._edit_pair.get_value(StudentPairAttrib.Classroom).set_classroom(classes)
-        self._edit_pair.get_value(StudentPairAttrib.Subgroup).set_subgroup(subgroup)
-        self._edit_pair.get_value(StudentPairAttrib.Time).set_time(start_time, end_time)
+        new_pair = StudentPair()
+        new_pair.get_value(StudentPairAttrib.Title).set_title(title)
+        new_pair.get_value(StudentPairAttrib.Lecturer).set_lecturer(lecturer)
+        new_pair.get_value(StudentPairAttrib.Type).set_type(pair_type)
+        new_pair.get_value(StudentPairAttrib.Classroom).set_classroom(classes)
+        new_pair.get_value(StudentPairAttrib.Subgroup).set_subgroup(subgroup)
+        new_pair.get_value(StudentPairAttrib.Time).set_time(start_time, end_time)
+        for date in self._dates:
+            new_pair.get_value(StudentPairAttrib.Date).add_date(date)
+
+        self._edit_pair = new_pair
 
         return True
 
@@ -207,6 +213,7 @@ class PairCreatorWindow(QDialog):
             self.combo_box_start.setCurrentIndex(number)
             self.combo_box_end.setCurrentIndex(number)
 
+        self._dates = self._edit_pair.get_value(StudentPairAttrib.Date)
         self.update_list_widget_date()
 
     def get_pair(self):
@@ -220,7 +227,7 @@ class PairCreatorWindow(QDialog):
             create_date = date_creator.get_date()
             if create_date is not None:
                 try:
-                    self._edit_pair.get_value(StudentPairAttrib.Date).add_date(create_date)
+                    self._dates.add_date(create_date)
                     self.update_list_widget_date()
                     break
                 except InvalidDatePair as ex:
@@ -238,23 +245,23 @@ class PairCreatorWindow(QDialog):
             return
 
         original_date = item.data(Qt.UserRole)
-        self._edit_pair.get_value(StudentPairAttrib.Date).remove_date(item.data(Qt.UserRole))
+        self._dates.remove_date(item.data(Qt.UserRole))
 
         date_editor = DateCreatorWindow(self)
-        date_editor.set_date(copy.deepcopy(original_date))
+        date_editor.set_date(original_date.copy())
 
         while True:
             date_editor.exec_()
             edit_date = date_editor.get_date()
             if edit_date is not None:
                 try:
-                    self._edit_pair.get_value(StudentPairAttrib.Date).add_date(edit_date)
+                    self._dates.add_date(edit_date)
                     self.update_list_widget_date()
                     break
                 except InvalidDatePair as ex:
                     QMessageBox.critical(self, self.tr("Invalid date pair"), str(ex))
             else:
-                self._edit_pair.get_value(StudentPairAttrib.Date).add_date(original_date)
+                self._dates.add_date(original_date)
                 break
 
     def push_button_remove_date_clicked(self):
@@ -266,14 +273,13 @@ class PairCreatorWindow(QDialog):
                                     self.tr("No date selected"))
             return
 
-        self._edit_pair.get_value(StudentPairAttrib.Date).remove_date(item.data(Qt.UserRole))
+        self._dates.remove_date(item.data(Qt.UserRole))
         self.update_list_widget_date()
 
     def update_list_widget_date(self):
         """ Updates the list of dates in the window """
-        dates = self._edit_pair.get_value(StudentPairAttrib.Date).get_dates()
         self.list_widget_date.clear()
-        for date in dates:
+        for date in self._dates:
             item = QListWidgetItem(str(date))
             item.setData(Qt.UserRole, date)
             self.list_widget_date.addItem(item)

@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from project.schedule import Schedule
 from project.pair_creator_window import PairCreatorWindow
-import copy
 
 
 class PairSelectorWindow(QDialog):
@@ -19,6 +18,7 @@ class PairSelectorWindow(QDialog):
         self.index = index
 
         # window settings
+        self.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
         self.setWindowTitle(self.tr("Selector"))
         self.setMinimumSize(500, 300)
 
@@ -27,25 +27,27 @@ class PairSelectorWindow(QDialog):
         self.list_widget.setWordWrap(True)
         self.list_widget.setSelectionMode(QAbstractItemView.SingleSelection)
 
-        horizontal_layout = QHBoxLayout(self)
+        self.layout_horizontal = QHBoxLayout()
 
-        horizontal_layout.addWidget(self.list_widget)
-        vertical_layout = QVBoxLayout()
+        self.layout_horizontal.addWidget(self.list_widget)
+        self.layout_navigate = QVBoxLayout()
 
-        self.push_button_new = QPushButton(self.tr("New"), self)
-        vertical_layout.addWidget(self.push_button_new)
+        self.push_button_new = QPushButton(self.tr("New"))
+        self.layout_navigate.addWidget(self.push_button_new)
 
-        self.push_button_edit = QPushButton(self.tr("Edit"), self)
-        vertical_layout.addWidget(self.push_button_edit)
+        self.push_button_edit = QPushButton(self.tr("Edit"))
+        self.layout_navigate.addWidget(self.push_button_edit)
 
-        self.push_button_remove = QPushButton(self.tr("Remove"), self)
-        vertical_layout.addWidget(self.push_button_remove)
+        self.push_button_remove = QPushButton(self.tr("Remove"))
+        self.layout_navigate.addWidget(self.push_button_remove)
 
-        self.push_button_cancel = QPushButton(self.tr("Cancel"), self)
-        vertical_layout.addWidget(self.push_button_cancel)
+        self.push_button_cancel = QPushButton(self.tr("Cancel"))
+        self.layout_navigate.addWidget(self.push_button_cancel)
 
-        vertical_layout.addStretch(1)
-        horizontal_layout.addLayout(vertical_layout)
+        self.layout_navigate.addStretch(1)
+        self.layout_horizontal.addLayout(self.layout_navigate)
+
+        self.setLayout(self.layout_horizontal)
 
         self.update_pairs_list()
 
@@ -71,7 +73,7 @@ class PairSelectorWindow(QDialog):
         self.scheduler_ref.remove_pair(self.index.row(), self.index.column(), remove_pair)
 
     def push_button_new_clicked(self):
-        creator = PairCreatorWindow(self.scheduler_ref, self.index, self)
+        creator = PairCreatorWindow(self.index, self)
         while True:
             creator.exec_()
             new_pair = creator.get_pair()
@@ -94,8 +96,8 @@ class PairSelectorWindow(QDialog):
         origin_pair = item.data(Qt.UserRole)
         self.remove_pair(item)
 
-        creator = PairCreatorWindow(self.scheduler_ref, self.index, self)
-        creator.set_pair(copy.deepcopy(origin_pair))
+        creator = PairCreatorWindow(self.index, self)
+        creator.set_pair(origin_pair.copy())
 
         while True:
             creator.exec_()

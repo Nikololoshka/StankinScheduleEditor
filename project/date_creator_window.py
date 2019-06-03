@@ -24,13 +24,13 @@ class DateCreatorWindow(QDialog):
         self.check_box = QCheckBox(self.tr("Range date"))
 
         # date layout
-        self.form_layout_date = QFormLayout()
+        self.layout_date_edit = QFormLayout()
 
         # simple date layout
         self.label_simple_date = QLabel(self.tr("Date"))
-        self.form_layout_date.setWidget(0, QFormLayout.LabelRole, self.label_simple_date)
+        self.layout_date_edit.setWidget(0, QFormLayout.LabelRole, self.label_simple_date)
         self.date_edit_simple = QDateEdit()
-        self.form_layout_date.setWidget(0, QFormLayout.FieldRole, self.date_edit_simple)
+        self.layout_date_edit.setWidget(0, QFormLayout.FieldRole, self.date_edit_simple)
 
         self.date_edit_simple.setCalendarPopup(True)
         self.date_edit_simple.setDisplayFormat('dd.MM.yyyy')
@@ -40,19 +40,19 @@ class DateCreatorWindow(QDialog):
 
         # range date layout
         self.label_date_start = QLabel(self.tr("Start"))
-        self.form_layout_date.setWidget(1, QFormLayout.LabelRole, self.label_date_start)
+        self.layout_date_edit.setWidget(1, QFormLayout.LabelRole, self.label_date_start)
         self.date_edit_start = QDateEdit()
-        self.form_layout_date.setWidget(1, QFormLayout.FieldRole, self.date_edit_start)
+        self.layout_date_edit.setWidget(1, QFormLayout.FieldRole, self.date_edit_start)
 
         self.label_date_end = QLabel(self.tr("End"))
-        self.form_layout_date.setWidget(2, QFormLayout.LabelRole, self.label_date_end)
+        self.layout_date_edit.setWidget(2, QFormLayout.LabelRole, self.label_date_end)
         self.date_edit_end = QDateEdit()
-        self.form_layout_date.setWidget(2, QFormLayout.FieldRole, self.date_edit_end)
+        self.layout_date_edit.setWidget(2, QFormLayout.FieldRole, self.date_edit_end)
 
         self.label_date_frequency = QLabel(self.tr("Frequency"))
-        self.form_layout_date.setWidget(3, QFormLayout.LabelRole, self.label_date_frequency)
+        self.layout_date_edit.setWidget(3, QFormLayout.LabelRole, self.label_date_frequency)
         self.combo_box_frequency = QComboBox()
-        self.form_layout_date.setWidget(3, QFormLayout.FieldRole, self.combo_box_frequency)
+        self.layout_date_edit.setWidget(3, QFormLayout.FieldRole, self.combo_box_frequency)
 
         self.date_edit_start.setCalendarPopup(True)
         self.date_edit_start.setDisplayFormat('dd.MM.yyyy')
@@ -70,29 +70,29 @@ class DateCreatorWindow(QDialog):
         self.combo_box_frequency.addItem(str(FrequencyDate.Throughout), FrequencyDate.Throughout)
 
         # navigate
-        self.horizontal_layout_down = QHBoxLayout()
+        self.layout_navigate = QHBoxLayout()
 
-        self.horizontal_layout_down.addStretch(1)
+        self.layout_navigate.addStretch(1)
 
         self.push_button_ok = QPushButton(self.tr("OK"))
-        self.horizontal_layout_down.addWidget(self.push_button_ok)
+        self.layout_navigate.addWidget(self.push_button_ok)
 
         self.push_button_apply = QPushButton(self.tr("Apply"))
-        self.horizontal_layout_down.addWidget(self.push_button_apply)
+        self.layout_navigate.addWidget(self.push_button_apply)
 
         self.push_button_cancel = QPushButton(self.tr("Cancel"))
-        self.horizontal_layout_down.addWidget(self.push_button_cancel)
+        self.layout_navigate.addWidget(self.push_button_cancel)
 
         # layout setup
-        self.main_layout = QVBoxLayout()
-        self.main_layout.setAlignment(Qt.AlignCenter)
+        self.layout_main = QVBoxLayout()
+        self.layout_main.setAlignment(Qt.AlignCenter)
 
-        self.main_layout.addWidget(self.check_box)
-        self.main_layout.addLayout(self.form_layout_date)
-        self.main_layout.addStretch(1)
-        self.main_layout.addLayout(self.horizontal_layout_down)
+        self.layout_main.addWidget(self.check_box)
+        self.layout_main.addLayout(self.layout_date_edit)
+        self.layout_main.addStretch(1)
+        self.layout_main.addLayout(self.layout_navigate)
 
-        self.setLayout(self.main_layout)
+        self.setLayout(self.layout_main)
 
         # connection
         self.check_box.clicked.connect(self.check_box_clicked)

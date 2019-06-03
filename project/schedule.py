@@ -2,12 +2,24 @@
 
 # imports
 import xml.etree.ElementTree as Xml
+from PyQt5.QtCore import QT_TR_NOOP_UTF8
 from project.pair import StudentPair, StudentPairAttrib, DaysOfWeek
 from project import defaults
 
 
+class ScheduleException(Exception):
+    """ Class that describes errors associated with the schedule """
+
+    def __init__(self, msg):
+        self._msg = msg
+
+    def __str__(self):
+        return self._msg
+
+
 class Schedule:
     """ Class describing the schedule of pairs """
+
     def __init__(self):
         self.change: bool = False
         self.schedule_list = {
@@ -67,11 +79,21 @@ class Schedule:
         time = pair.get_value(StudentPairAttrib.Time).get_number()
         week_day = pair.get_value(StudentPairAttrib.Date).get_week_day()
 
-        dates = self.schedule_list[week_day][time]
+        pairs = self.schedule_list[week_day][time]
+
+        for p in pairs:
+            if pair.get_value(StudentPairAttrib.Date) in \
+                    p.get_value(StudentPairAttrib.Date):
+                if not pair.get_value(StudentPairAttrib.Subgroup).is_separate() and \
+                        not p.get_value(StudentPairAttrib.Subgroup).is_separate():
+                    raise ScheduleException(
+                        QT_TR_NOOP_UTF8("There can't be two pairs at the same time!\n"
+                                        "{} and {}").format(str(pair), str(p)))
 
         i = 0
-        while i < len(dates):
-            if not dates[i].get_value(StudentPairAttrib.Date) < pair.get_value(StudentPairAttrib.Date):
+        while i < len(pairs):
+            if not pairs[i].get_value(StudentPairAttrib.Date) < \
+                   pair.get_value(StudentPairAttrib.Date):
                 break
             i += 1
 
