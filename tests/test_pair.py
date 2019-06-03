@@ -4,28 +4,24 @@
 from unittest import TestCase
 from xml.etree import ElementTree as Xml
 import itertools
-from project.pair import StudentPair, DatePair, TimePair, DateItem
-# from project import defaults
+from project.pair import StudentPair, DatePair, TimePair, DateItem, DateRange, \
+                         FrequencyDate, InvalidDatePair
+from project import defaults
 
 
 class TestPair(TestCase):
     def test_student_pair(self):
-        tree = Xml.ElementTree(file="./examples/example_1.xml")
+        tree = Xml.ElementTree(file="../examples/example_1.xml")
         root = tree.getroot()
 
-        if not Xml.iselement(root):
-            print("No valid root of tree")
-            exit(-1)
+        self.assertTrue(Xml.iselement(root), "No valid root of tree")
 
         # print("root - tag: '{}', attrib: {}".format(root.tag, root.attrib))
 
         for day_of_week in root:
             for pairs in day_of_week:
-                StudentPair.from_xml(pairs)
-                # print(sp)
-                # print(defaults.prettify(sp.save()))
-
-        self.assertTrue(True, "Student pair test failed")
+                sp = StudentPair.from_xml(pairs)
+                defaults.prettify(sp.save())
 
     def test_classroom_pair(self):
         pass
@@ -48,6 +44,11 @@ class TestPair(TestCase):
                          "Date load/save test failed")
 
         self.assertIn(DateItem("2019.03.30"), d, "Date contains test failed")
+        self.assertRaises(InvalidDatePair,
+                          d.add_date, DateRange("2019.02.19", "2019.04.24", FrequencyDate.Every))
+
+        self.assertRaises(InvalidDatePair,
+                          d.add_date, DateItem("2019.06.02"))
 
         correct_str = "09.02, 16.02-16.03 ч.н., 23.03-27.04 к.н., 18.05, 25.05"
 
