@@ -60,7 +60,7 @@ class ScheduleEditorWindow(QMainWindow):
 
         # window settings
         self.setWindowTitle(self.tr("Schedule Editor"))
-        self.setMinimumSize(QSize(800, 600))
+        self.setMinimumSize(800, 600)
 
         # central widget settings
         self.table_widget = QTableWidget()
