@@ -173,7 +173,8 @@ class DateCreatorWindow(QDialog):
                 msg = ""
                 style = ""
             else:
-                msg = self.tr("The number of days between dates is not a multiple of {}").format(self._date_delta)
+                msg = self.tr("The number of days between "
+                              "dates is not a multiple of {}").format(self._date_delta)
                 style = "QDateEdit { background-color: #ff5e5e; }"
         else:
             msg = self.tr("Different days of the week at dates")
