@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/translations">
+        <file alias="application_ru_RU">translations/application_ru_RU.qm</file>
+        <file alias="schedule_ru_RU">translations/schedule_ru_RU.qm</file>
+    </qresource>
+    <qresource prefix="/completions">
+        <file alias="lecturers">lecturers.txt</file>
+    </qresource>
+</RCC>
