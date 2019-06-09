@@ -110,7 +110,7 @@ class PairSelectorWindow(QDialog):
                 except Exception as ex:
                     QMessageBox.critical(self, self.tr("Invalid pair"), str(ex))
             else:
-                self.scheduler_ref.add_pair(origin_pair)
+                self.scheduler_ref.add_pair(origin_pair, True)
                 break
 
     def push_button_remove_clicked(self):

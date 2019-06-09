@@ -2,7 +2,6 @@
 
 # imports
 import xml.etree.ElementTree as Xml
-from PyQt5.QtCore import QT_TR_NOOP_UTF8
 from project.pair import StudentPair, StudentPairAttrib, DaysOfWeek
 from project import defaults
 
@@ -74,7 +73,7 @@ class Schedule:
         """ Returns a list of pairs in the table """
         return self.schedule_list[DaysOfWeek.value_of(i)][j]
 
-    def add_pair(self, pair: StudentPair) -> None:
+    def add_pair(self, pair: StudentPair, back: bool = False) -> None:
         """ Adds a student pair to the schedule """
         time = pair.get_value(StudentPairAttrib.Time).get_number()
         week_day = pair.get_value(StudentPairAttrib.Date).get_week_day()
@@ -86,9 +85,8 @@ class Schedule:
                     p.get_value(StudentPairAttrib.Date):
                 if not pair.get_value(StudentPairAttrib.Subgroup).is_separate() and \
                         not p.get_value(StudentPairAttrib.Subgroup).is_separate():
-                    raise ScheduleException(
-                        QT_TR_NOOP_UTF8("There can't be two pairs at the same time!\n"
-                                        "{} and {}").format(str(pair), str(p)))
+                    raise ScheduleException("There can't be two pairs at the same time!\n"
+                                            "{} and {}".format(str(pair), str(p)))
 
         i = 0
         while i < len(pairs):
@@ -98,7 +96,9 @@ class Schedule:
             i += 1
 
         self.schedule_list[week_day][time].insert(i, pair)
-        self.change = True
+
+        if not back:
+            self.change = True
 
     def remove_pair(self, i, j, pair: StudentPair):
         """ Remove a student pair from schedule  """
