@@ -5,9 +5,10 @@ from PyQt5.QtWidgets import QDialog, QWidget, QFormLayout, QLineEdit, QLabel, QC
                             QGroupBox, QDateEdit, QHBoxLayout, QVBoxLayout, QPushButton, \
                             QSizePolicy, QMessageBox, QComboBox, QProgressDialog, \
                             QFileDialog, QColorDialog, qApp
-from PyQt5.QtCore import Qt, QStandardPaths, QDate, QFileInfo
-from PyQt5.QtGui import QColor, QPixmap, QIcon, QFontDatabase, QFont, QFontInfo
+from PyQt5.QtCore import Qt, QStandardPaths, QDate, QFileInfo, QUrl
+from PyQt5.QtGui import QColor, QPixmap, QIcon, QDesktopServices
 from fpdf import FPDF   # PyFPDF2
+from fpdf.ttfonts import TTFontFile
 
 from project.schedule import Schedule
 from datetime import timedelta
@@ -15,8 +16,8 @@ from project.pair import DaysOfWeek, StudentPairAttrib, SubgroupPairAttrib, Date
 from project import defaults
 
 import os
+import re
 import platform
-import collections
 
 FPDF.FPDF_CACHE_MODE = 1  # no cache
 
@@ -45,8 +46,8 @@ class ExportWindow(QDialog):
         self.check_box_add_date = QCheckBox(self.tr("Add date"))
         self.layout_title_date.addWidget(self.check_box_add_date)
 
-        self.line_edit_title.setText(self.tr("Моя группа. А подгруппа - зеленый цвет, "
-                                             "Б - желтый цвет"))
+        self.line_edit_title.setPlaceholderText(self.tr("My Group. A subgroup - green color, "
+                                                        "B subgroup - yellow color. "))
         self.check_box_add_date.setChecked(True)
 
         # preview
@@ -73,9 +74,10 @@ class ExportWindow(QDialog):
         self.combo_box_encoding = QComboBox()
         self.form_layout_font.setWidget(1, QFormLayout.FieldRole, self.combo_box_encoding)
 
-        for font_name, font_path in get_fonts():
+        for font_name, font_path in self.get_fonts():
             self.combo_box_font.addItem(font_name, font_path)
 
+        self.combo_box_font.setCurrentText(qApp.font().family())
         self.combo_box_font.setEditable(True)
 
         self.combo_box_encoding.addItem("UTF-8")
@@ -193,7 +195,7 @@ class ExportWindow(QDialog):
         ]
 
         for name, data in color_items:
-            combo_box.addItem(create_color_icon(data), name, data)
+            combo_box.addItem(self.create_color_icon(data), name, data)
 
     def export_to_pdf(self) -> None:
 
@@ -202,7 +204,7 @@ class ExportWindow(QDialog):
 
         if self._file is None:
             path = QFileDialog.getSaveFileName(self,
-                                               self.tr("Export pdf"),
+                                               self.tr("Export to pdf"),
                                                ".",
                                                "PDF file (*.pdf)")[0]
             if path == "":
@@ -216,9 +218,10 @@ class ExportWindow(QDialog):
         weeks = self.date_edit_start.date().daysTo(self.date_edit_end.date()) / 7
         count = 0
 
-        progress = QProgressDialog("Export to pdf", "Abort export", 0, weeks, self)
+        progress = QProgressDialog(self.tr("Export to pdf"),
+                                   self.tr("Abort export"), 0, weeks, self)
         progress.setWindowModality(Qt.WindowModal)
-        progress.setMinimumDuration(2000)
+        progress.setMinimumDuration(1000)
 
         pdf = FPDF(orientation="L")
 
@@ -336,7 +339,16 @@ class ExportWindow(QDialog):
 
         pdf.output(self._file.absoluteFilePath())
         progress.setValue(weeks)
-        QMessageBox.information(self, self.tr("Export to pdf"), self.tr("Gone!"))
+
+        finish_msg_box = QMessageBox(QMessageBox.Information,  self.tr("Export to pdf"),
+                                     self.tr("Gone!"))
+        open_folder_button = finish_msg_box.addButton(self.tr("Open folder"),
+                                                      QMessageBox.ActionRole)
+        finish_msg_box.addButton(QMessageBox.Ok)
+        finish_msg_box.exec_()
+
+        if finish_msg_box.clickedButton() == open_folder_button:
+            QDesktopServices.openUrl(QUrl(self._file.absolutePath()))
 
     def encoding_test(self) -> bool:
         font_name = self.combo_box_font.currentText()
@@ -375,7 +387,7 @@ class ExportWindow(QDialog):
     def custom_color_selected(self, combo_box: QComboBox) -> None:
         color = QColorDialog.getColor(combo_box.currentData(), self)
         if color.isValid():
-            combo_box.setItemIcon(0, create_color_icon(color))
+            combo_box.setItemIcon(0, self.create_color_icon(color))
             combo_box.setItemData(0, color)
 
     def date_edit_start_changed(self, date: QDate):
@@ -384,36 +396,55 @@ class ExportWindow(QDialog):
         self.date_edit_end.setDate(end_date)
         self._date_start_cache = QDate(date)
 
+    @staticmethod
+    def create_color_icon(color: QColor) -> QIcon:
+        pix_map = QPixmap(32, 32)
+        pix_map.fill(color)
+        icon = QIcon(pix_map)
+        return icon
 
-def create_color_icon(color: QColor) -> QIcon:
-    pix_map = QPixmap(32, 32)
-    pix_map.fill(color)
-    icon = QIcon(pix_map)
-    return icon
+    def get_fonts(self) -> list:
+        paths = []
 
+        for path in QStandardPaths.standardLocations(QStandardPaths.FontsLocation):
+            if os.path.isdir(path):
+                paths.append(path)
 
-def get_fonts() -> list:
-    paths = []
+        if platform.system() == "Linux":
+            unix_paths = QStandardPaths.standardLocations(QStandardPaths.AppDataLocation)
+            for path in unix_paths:
+                possible_path = os.path.dirname(path) + os.sep + "fonts"
+                if os.path.isdir(possible_path):
+                    paths.append(possible_path)
 
-    for path in QStandardPaths.standardLocations(QStandardPaths.FontsLocation):
-        if os.path.isdir(path):
-            paths.append(path)
+        fonts = dict()
 
-    if platform.system() == "Linux":
-        unix_paths = QStandardPaths.standardLocations(QStandardPaths.AppDataLocation)
-        for path in unix_paths:
-            possible_path = os.path.dirname(path) + os.sep + "fonts"
-            if os.path.isdir(possible_path):
-                paths.append(possible_path)
+        max_progress = len(paths)
+        progress_load_font = QProgressDialog(self.tr("Font loading"),
+                                             self.tr("Cancel loading"),
+                                             0, max_progress, self.parentWidget())
+        # progress_load_font.setWindowModality(Qt.WindowModal)
+        progress_load_font.setMinimumDuration(1000)
 
-    fonts = dict()
+        for i, path in enumerate(paths):
+            progress_load_font.setValue(i)
+            for dir_path, dir_names, file_names in os.walk(path):
+                for filename in file_names:
+                    if filename.endswith(".ttf"):
+                        try:
+                            absolute_file_path = dir_path + os.sep + filename
 
-    for path in paths:
-        for dir_path, dir_names, file_names in os.walk(path):
-            for filename in file_names:
-                if filename.endswith(".ttf"):
-                    absolute_file_path = dir_path + os.sep + filename
-                    fonts[filename[0:-4]] = absolute_file_path
+                            ttf = TTFontFile()
+                            ttf.getMetrics(absolute_file_path)
+                            font_name = ttf.fullName.replace("-", " ")
+                            font_name = " ".join(re.findall(r"[A-Z]?[^A-Z\s]+|[A-Z]+", font_name))
 
-    fonts = sorted(fonts.items())
-    return fonts
+                            if font_name not in fonts:
+                                fonts[font_name] = absolute_file_path
+
+                        except RuntimeError:
+                            pass
+
+        progress_load_font.setValue(max_progress)
+        fonts = sorted(fonts.items())
+        return fonts
