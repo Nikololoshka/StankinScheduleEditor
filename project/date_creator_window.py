@@ -33,7 +33,7 @@ class DateCreatorWindow(QDialog):
         self.layout_date_edit.setWidget(0, QFormLayout.FieldRole, self.date_edit_simple)
 
         self.date_edit_simple.setCalendarPopup(True)
-        self.date_edit_simple.setDisplayFormat('dd.MM.yyyy')
+        self.date_edit_simple.setDisplayFormat("dd.MM.yyyy")
         self.date_edit_simple.setDate(QDate.currentDate())
         self.date_edit_simple.setDateRange(QDate.currentDate().addDays(-365),
                                            QDate.currentDate().addDays(365))
@@ -55,13 +55,13 @@ class DateCreatorWindow(QDialog):
         self.layout_date_edit.setWidget(3, QFormLayout.FieldRole, self.combo_box_frequency)
 
         self.date_edit_start.setCalendarPopup(True)
-        self.date_edit_start.setDisplayFormat('dd.MM.yyyy')
+        self.date_edit_start.setDisplayFormat("dd.MM.yyyy")
         self.date_edit_start.setDate(QDate.currentDate())
         self.date_edit_start.setDateRange(QDate.currentDate().addDays(-365),
                                           QDate.currentDate().addDays(365))
 
         self.date_edit_end.setCalendarPopup(True)
-        self.date_edit_end.setDisplayFormat('dd.MM.yyyy')
+        self.date_edit_end.setDisplayFormat("dd.MM.yyyy")
         self.date_edit_end.setDate(QDate.currentDate().addDays(self._date_delta))
         self.date_edit_end.setDateRange(QDate.currentDate().addDays(self._date_delta),
                                         QDate.currentDate().addDays(365))
@@ -171,14 +171,11 @@ class DateCreatorWindow(QDialog):
         if self.date_edit_start.date().dayOfWeek() == self.date_edit_end.date().dayOfWeek():
             if self.date_edit_start.date().daysTo(self.date_edit_end.date()) % self._date_delta == 0:
                 msg = ""
-                style = ""
             else:
                 msg = self.tr("The number of days between "
                               "dates is not a multiple of {}").format(self._date_delta)
-                style = "QDateEdit { background-color: #ff5e5e; }"
         else:
             msg = self.tr("Different days of the week at dates")
-            style = "QDateEdit { background-color: #ff5e5e; }"
 
         if msg == "":
             self.push_button_ok.setEnabled(True)
@@ -187,8 +184,6 @@ class DateCreatorWindow(QDialog):
             self.push_button_ok.setEnabled(False)
             self.push_button_apply.setEnabled(False)
 
-        self.date_edit_start.setStyleSheet(style)
-        self.date_edit_end.setStyleSheet(style)
         self.date_edit_start.setToolTip(msg)
         self.date_edit_end.setToolTip(msg)
 

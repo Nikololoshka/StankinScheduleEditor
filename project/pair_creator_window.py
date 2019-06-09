@@ -43,6 +43,7 @@ class PairCreatorWindow(QDialog):
         self.layout_general.setWidget(1, QFormLayout.FieldRole, self.line_edit_lecturer)
 
         self.completer = QCompleter(defaults.get_lecturers())
+        self.completer.setModelSorting(QCompleter.CaseSensitivelySortedModel)
         self.completer.setCaseSensitivity(Qt.CaseInsensitive)
         self.completer.setFilterMode(Qt.MatchContains)
         self.line_edit_lecturer.setCompleter(self.completer)
@@ -231,7 +232,9 @@ class PairCreatorWindow(QDialog):
                     self.update_list_widget_date()
                     break
                 except InvalidDatePair as ex:
-                    QMessageBox.critical(self, self.tr("Invalid date pair"), str(ex))
+                    QMessageBox.critical(self,
+                                         self.tr("Invalid date pair"),
+                                         str(ex))
             else:
                 break
 
@@ -259,7 +262,9 @@ class PairCreatorWindow(QDialog):
                     self.update_list_widget_date()
                     break
                 except InvalidDatePair as ex:
-                    QMessageBox.critical(self, self.tr("Invalid date pair"), str(ex))
+                    QMessageBox.critical(self,
+                                         self.tr("Invalid date pair"),
+                                         str(ex))
             else:
                 self._dates.add_date(original_date)
                 break
