@@ -4,11 +4,12 @@
 from PyQt5.QtWidgets import QHeaderView, QMainWindow, QTableWidget, QAbstractItemView, \
                             QSizePolicy, QTableWidgetItem, QAction, qApp, \
                             QFileDialog, QMessageBox, QMenu
-from PyQt5.QtCore import QRectF, Qt, QSize, QFileInfo, QPoint
+from PyQt5.QtCore import QRectF, Qt, QSize, QFileInfo, QPoint, QEvent
 from PyQt5.QtGui import QFont, QFontMetrics, QIcon, QResizeEvent
 
 from project.pair_selector_window import PairSelectorWindow
 from project.export_window import ExportWindow
+from project.settings import SettingsWindow
 from project.schedule import Schedule
 from project.pair import DaysOfWeek
 from project import defaults
@@ -91,52 +92,77 @@ class ScheduleEditorWindow(QMainWindow):
         self.setCentralWidget(self.table_widget)
 
         # menu bar settings
-        menu_bar = self.menuBar()
-        menu_file = menu_bar.addMenu(self.tr("&File"))
+        self.menu_bar = self.menuBar()
+        self.menu_file = self.menu_bar.addMenu(self.tr("&File"))
 
-        action_new_file = QAction(QIcon.fromTheme("document-new"), self.tr("&New file"), self)
-        action_new_file.setShortcut("Ctrl+N")
-        menu_file.addAction(action_new_file)
+        self.action_new_file = QAction(QIcon.fromTheme("document-new"), self.tr("&New file"), self)
+        self.action_new_file.setShortcut("Ctrl+N")
+        self.menu_file.addAction(self.action_new_file)
 
-        action_open = QAction(QIcon.fromTheme("document-open"), self.tr("&Open"), self)
-        action_open.setShortcut("Ctrl+O")
-        menu_file.addAction(action_open)
+        self.action_open = QAction(QIcon.fromTheme("document-open"), self.tr("&Open"), self)
+        self.action_open.setShortcut("Ctrl+O")
+        self.menu_file.addAction(self.action_open)
 
-        action_save = QAction(QIcon.fromTheme("document-save"), self.tr("&Save"), self)
-        action_save.setShortcut("Ctrl+S")
-        menu_file.addAction(action_save)
+        self.action_save = QAction(QIcon.fromTheme("document-save"), self.tr("&Save"), self)
+        self.action_save.setShortcut("Ctrl+S")
+        self.menu_file.addAction(self.action_save)
 
-        action_save_as = QAction(QIcon.fromTheme("document-save-as"), self.tr("Save as..."), self)
-        action_save_as.setShortcut("Ctrl+S+A")
-        menu_file.addAction(action_save_as)
+        self.action_save_as = QAction(QIcon.fromTheme("document-save-as"), self.tr("Save as..."), self)
+        self.action_save_as.setShortcut("Ctrl+S+A")
+        self.menu_file.addAction(self.action_save_as)
 
-        action_export = QAction(self.tr("Export"), self)
-        action_export.setShortcut("Ctrl+E")
-        menu_file.addAction(action_export)
+        self.action_export = QAction(self.tr("Export"), self)
+        self.action_export.setShortcut("Ctrl+E")
+        self.menu_file.addAction(self.action_export)
 
-        menu_file.addSeparator()
+        self.menu_file.addSeparator()
 
-        action_about = QAction(self.tr("About"), self)
-        menu_file.addAction(action_about)
+        self.action_settings = QAction(self.tr("Settings"), self)
+        self.menu_file.addAction(self.action_settings)
 
-        action_exit = QAction(self.tr("&Quit"), self)
-        action_exit.setShortcut("Ctrl+Q")
-        menu_file.addAction(action_exit)
+        self.action_about = QAction(self.tr("About"), self)
+        self.menu_file.addAction(self.action_about)
+
+        self.action_exit = QAction(self.tr("&Quit"), self)
+        self.action_exit.setShortcut("Ctrl+Q")
+        self.menu_file.addAction(self.action_exit)
 
         # status bar settings
         self.statusBar().showMessage(self.tr("Ready!"))
 
         # connection
-        action_new_file.triggered.connect(self.action_new_file_clicked)
-        action_open.triggered.connect(self.action_open_clicked)
-        action_save.triggered.connect(self.action_save_clicked)
-        action_save_as.triggered.connect(self.action_save_as_clicked)
-        action_export.triggered.connect(self.action_export_clicked)
-        action_about.triggered.connect(self.action_about_clicked)
-        action_exit.triggered.connect(self.close)
+        self.action_new_file.triggered.connect(self.action_new_file_clicked)
+        self.action_open.triggered.connect(self.action_open_clicked)
+        self.action_save.triggered.connect(self.action_save_clicked)
+        self.action_save_as.triggered.connect(self.action_save_as_clicked)
+        self.action_export.triggered.connect(self.action_export_clicked)
+        self.action_settings.triggered.connect(self.action_settings_clicked)
+        self.action_about.triggered.connect(self.action_about_clicked)
+        self.action_exit.triggered.connect(self.close)
 
         self.table_widget.doubleClicked.connect(self.cell_clicked)
         self.table_widget.customContextMenuRequested.connect(self.context_menu_requested)
+
+    def changeEvent(self, event: QEvent) -> None:
+        if event.type() == QEvent.LanguageChange:
+            self.setWindowTitle(self.tr("Schedule Editor"))
+            self.menu_file.setTitle(self.tr("&File"))
+            self.action_new_file.setText(self.tr("&New file"))
+            self.action_open.setText(self.tr("&Open"))
+            self.action_save.setText(self.tr("&Save"))
+            self.action_save_as.setText(self.tr("Save as..."))
+            self.action_export.setText(self.tr("Export"))
+            self.action_settings.setText(self.tr("Settings"))
+            self.action_about.setText(self.tr("About"))
+            self.action_exit.setText(self.tr("&Quit"))
+
+            for i, day in enumerate(DaysOfWeek.to_list()):
+                item = QTableWidgetItem(day)
+                self.table_widget.setVerticalHeaderItem(i, item)
+
+            self.update_table_widget()
+        else:
+            super().changeEvent(event)
 
     def resizeEvent(self, a0: QResizeEvent) -> None:
         self.update_table_widget()
@@ -181,7 +207,7 @@ class ScheduleEditorWindow(QMainWindow):
         """
         if self.schedule.is_change():
             answer = QMessageBox.warning(self,
-                                         self.tr("The document has been modified."),
+                                         self.tr("The document has been modified"),
                                          self.tr("Do you want to save the changes you made?\n"
                                                  "You changes will be lost if you don't save them"),
                                          QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel,
@@ -203,17 +229,18 @@ class ScheduleEditorWindow(QMainWindow):
             if not self.action_new_file_clicked():
                 return
 
-        path = QFileDialog.getOpenFileName(self, self.tr("Open xml file"), "./examples", "XML file (*.xml)")[0]
+        path = QFileDialog.getOpenFileName(self,
+                                           self.tr("Open schedule from XML file"),
+                                           ".",
+                                           "XML file (*.xml)")[0]
         if path == "":
             return
-        # try:
+
         self.schedule.load(path)
         self.file = QFileInfo(path)
         self.statusBar().showMessage(self.tr("Load file: ") + path, 5000)
         self.setWindowTitle(self.tr("Schedule Editor [{}]").format(self.file.absoluteFilePath()))
         self.update_table_widget()
-        # except Exception as e:
-        #    QMessageBox.critical(self, self.tr("Unknown error"), str(e))
 
     def action_save_clicked(self) -> None:
         """ Slot to handle file saving. """
@@ -227,7 +254,7 @@ class ScheduleEditorWindow(QMainWindow):
     def action_save_as_clicked(self) -> None:
         """ Slot to save the file if it has not been saved before """
         path = QFileDialog.getSaveFileName(self,
-                                           self.tr("Save schedule as xml file"),
+                                           self.tr("Save schedule as XML file"),
                                            "./examples",
                                            "XML file (*.xml)")[0]
         if path == "":
@@ -243,15 +270,19 @@ class ScheduleEditorWindow(QMainWindow):
 
     def action_export_clicked(self) -> None:
         """ Slot for schedule export to PDF """
-        exporter = ExportWindow(self.schedule)
+        exporter = ExportWindow(self.schedule, self)
         exporter.exec_()
+
+    def action_settings_clicked(self) -> None:
+        settings = SettingsWindow(self)
+        settings.exec_()
 
     def action_about_clicked(self) -> None:
         """ Slot display window: "About program" """
         QMessageBox.information(self,
                                 self.tr("About program"),
                                 self.tr("""
-                                    <b>Stankin Schedule Editor</b>"
+                                    <b>Stankin Schedule Editor</b>
                                     <p>
                                         The project is designed to create a weekly
                                         schedule in the form of pdf-files.
