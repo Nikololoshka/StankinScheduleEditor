@@ -1,7 +1,7 @@
 # coding: utf-8
 
 # imports
-from PyQt5.QtCore import QObject, QT_TR_NOOP_UTF8
+from PyQt5.QtCore import QObject
 import xml.etree.ElementTree as Xml
 from project.pair.attrib_pair import AttribPair
 from datetime import datetime, timedelta
@@ -40,14 +40,22 @@ class DaysOfWeek(Enum):
         return [str(name) for name in DaysOfWeek.__members__.values()]
 
     def __str__(self) -> str:
+        translator = DaysOfWeekTranslator()
+        return translator.translate(self)
+
+
+class DaysOfWeekTranslator(QObject):
+    """ A helper class to translate the enumeration of the days of the week """
+    def translate(self, day: DaysOfWeek) -> str:
+        """ Returns the translation of the day of the week """
         return {
-            DaysOfWeek.Monday: QT_TR_NOOP_UTF8("Понедельник"),
-            DaysOfWeek.Tuesday: QT_TR_NOOP_UTF8("Вторник"),
-            DaysOfWeek.Wednesday: QT_TR_NOOP_UTF8("Среда"),
-            DaysOfWeek.Thursday: QT_TR_NOOP_UTF8("Четверг"),
-            DaysOfWeek.Friday: QT_TR_NOOP_UTF8("Пятница"),
-            DaysOfWeek.Saturday: QT_TR_NOOP_UTF8("Суббота")
-        }[self]
+            DaysOfWeek.Monday: self.tr("Monday"),
+            DaysOfWeek.Tuesday: self.tr("Tuesday"),
+            DaysOfWeek.Wednesday: self.tr("Wednesday"),
+            DaysOfWeek.Thursday: self.tr("Thursday"),
+            DaysOfWeek.Friday: self.tr("Friday"),
+            DaysOfWeek.Saturday: self.tr("Saturday")
+        }[day]
 
 
 class FrequencyDate(Enum):
@@ -62,11 +70,19 @@ class FrequencyDate(Enum):
         return FrequencyDate.__members__[s.title()]
 
     def __str__(self):
+        translator = FrequencyDateTranslator()
+        return translator.translate(self)
+
+
+class FrequencyDateTranslator(QObject):
+    """ A helper class to translate the enumeration of the frequency of student classes """
+    def translate(self, frequency: FrequencyDate) -> str:
+        """ Returns the translation of the frequency of student classes """
         return {
-            FrequencyDate.Once: QT_TR_NOOP_UTF8(""),
-            FrequencyDate.Every: QT_TR_NOOP_UTF8("к.н."),
-            FrequencyDate.Throughout: QT_TR_NOOP_UTF8("ч.н.")
-        }[self]
+            FrequencyDate.Once: self.tr(""),
+            FrequencyDate.Every: self.tr("e.w."),
+            FrequencyDate.Throughout: self.tr("t.w.")
+        }[frequency]
 
 
 class InvalidDatePair(Exception):
@@ -330,10 +346,10 @@ class DatePair(AttribPair):
             self._week_day = date_item.get_week_day()
         else:
             if self._week_day != date_item.get_week_day():
-                raise InvalidDatePair(self.tr("Dates have a different day of the week"))
+                raise InvalidDatePair("Dates have a different day of the week")
 
         if date_item in self:
-            raise InvalidDatePair(self.tr("Date crosses existing dates"))
+            raise InvalidDatePair("Date crosses existing dates")
 
         i = 0
         while i < len(self._dates):

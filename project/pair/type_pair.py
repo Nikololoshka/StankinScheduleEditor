@@ -1,7 +1,7 @@
 # coding: utf-8
 
 # imports
-from PyQt5.QtCore import QT_TR_NOOP_UTF8
+from PyQt5.QtCore import QObject
 from xml.etree import ElementTree as Xml
 from enum import Enum
 from project.pair.attrib_pair import AttribPair
@@ -28,12 +28,20 @@ class TypePairAttrib(Enum):
                (str(TypePairAttrib.Laboratory), TypePairAttrib.Laboratory)
 
     def __str__(self):
+        translator = TypePairAttribTranslator()
+        return translator.translate(self)
+
+
+class TypePairAttribTranslator(QObject):
+    """ A helper class to translate the enumeration of a pair type value """
+    def translate(self, type: TypePairAttrib) -> str:
+        """ Returns the translation of a pair type value """
         return {
             TypePairAttrib.Missing: "---",
-            TypePairAttrib.Lecture: QT_TR_NOOP_UTF8("Лекция"),
-            TypePairAttrib.Seminar: QT_TR_NOOP_UTF8("Семинар"),
-            TypePairAttrib.Laboratory: QT_TR_NOOP_UTF8("Лабораторная работа")
-        }[self]
+            TypePairAttrib.Lecture: self.tr("Lecture"),
+            TypePairAttrib.Seminar: self.tr("Seminar"),
+            TypePairAttrib.Laboratory: self.tr("Laboratory work")
+        }[type]
 
 
 class TypePair(AttribPair):

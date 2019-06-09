@@ -1,7 +1,7 @@
 # coding: utf-8
 
 # imports
-from PyQt5.QtCore import QT_TR_NOOP_UTF8
+from PyQt5.QtCore import QObject
 from xml.etree import ElementTree as Xml
 from enum import Enum
 from project.pair.attrib_pair import AttribPair
@@ -26,11 +26,19 @@ class SubgroupPairAttrib(Enum):
                (str(SubgroupPairAttrib.B), SubgroupPairAttrib.B)
 
     def __str__(self):
+        translator = SubgroupPairAttribTranslator()
+        return translator.translate(self)
+
+
+class SubgroupPairAttribTranslator(QObject):
+    """ A helper class to translate the enumeration of the subgroup value """
+    def translate(self, subgroup: SubgroupPairAttrib) -> str:
+        """ Returns the translation of the subgroup value """
         return {
             SubgroupPairAttrib.Common: "---",
-            SubgroupPairAttrib.A: QT_TR_NOOP_UTF8("(А)"),
-            SubgroupPairAttrib.B: QT_TR_NOOP_UTF8("(Б)")
-        }[self]
+            SubgroupPairAttrib.A: self.tr("(A)"),
+            SubgroupPairAttrib.B: self.tr("(B)")
+        }[subgroup]
 
 
 class SubgroupPair(AttribPair):
