@@ -50,7 +50,7 @@ class TestPair(TestCase):
         self.assertRaises(InvalidDatePair,
                           d.add_date, DateItem("2019.06.02"))
 
-        correct_str = "09.02, 16.02-16.03 ч.н., 23.03-27.04 к.н., 18.05, 25.05"
+        correct_str = "09.02, 16.02-16.03 t.w., 23.03-27.04 e.w., 18.05, 25.05"
 
         for lst in itertools.permutations(dates_lst):
             elem = Xml.fromstring("<dates>" + "".join(lst) + "</dates>")
