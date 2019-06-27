@@ -1,0 +1,66 @@
+<?xml version="1.0" ?>
+<schedule>
+	<monday>
+		<pair>
+			<title>t1</title>
+			<lecturer>t1</lecturer>
+			<type>Missing</type>
+			<subgroup>Common</subgroup>
+			<classroom>t1</classroom>
+			<time>
+				<start>12:20</start>
+				<end>14:00</end>
+			</time>
+			<dates>
+				<date frequency="once">2019.06.24</date>
+			</dates>
+		</pair>
+		<pair>
+			<title>t2</title>
+			<lecturer>t2</lecturer>
+			<type>Missing</type>
+			<subgroup>Common</subgroup>
+			<classroom>t2</classroom>
+			<time>
+				<start>12:20</start>
+				<end>15:50</end>
+			</time>
+			<dates>
+				<date frequency="once">2019.06.17</date>
+			</dates>
+		</pair>
+		<pair>
+			<title>t3</title>
+			<lecturer>t3</lecturer>
+			<type>Missing</type>
+			<subgroup>Common</subgroup>
+			<classroom>t3</classroom>
+			<time>
+				<start>12:20</start>
+				<end>17:40</end>
+			</time>
+			<dates>
+				<date frequency="once">2019.06.10</date>
+			</dates>
+		</pair>
+		<pair>
+			<title>t4</title>
+			<lecturer>t4</lecturer>
+			<type>Missing</type>
+			<subgroup>Common</subgroup>
+			<classroom>t4</classroom>
+			<time>
+				<start>12:20</start>
+				<end>19:30</end>
+			</time>
+			<dates>
+				<date frequency="once">2019.06.03</date>
+			</dates>
+		</pair>
+	</monday>
+	<tuesday/>
+	<wednesday/>
+	<thursday/>
+	<friday/>
+	<saturday/>
+</schedule>

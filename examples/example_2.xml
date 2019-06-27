@@ -2,12 +2,26 @@
 <schedule>
 	<monday>
 		<pair>
+			<title>Иностранный язык</title>
+			<lecturer>Стихова Ольга Владимировна</lecturer>
+			<type>Seminar</type>
+			<subgroup>Common</subgroup>
+			<classroom>238</classroom>
+			<time>
+				<start>14:10</start>
+				<end>15:50</end>
+			</time>
+			<dates>
+				<date frequency="every">2019.02.04-2019.05.20</date>
+			</dates>
+		</pair>
+		<pair>
 			<title>Прикладная физическая культура</title>
 			<lecturer>Волков Владимир Андреевич</lecturer>
 			<type>Lecture</type>
 			<subgroup>Common</subgroup>
 			<classroom>С/3 СТАНКИН</classroom>
-			<time count="1">
+			<time>
 				<start>12:20</start>
 				<end>14:00</end>
 			</time>
@@ -21,7 +35,7 @@
 			<type>Seminar</type>
 			<subgroup>Common</subgroup>
 			<classroom>С/3 СТАНКИН</classroom>
-			<time count="1">
+			<time>
 				<start>12:20</start>
 				<end>14:00</end>
 			</time>
@@ -30,83 +44,13 @@
 			</dates>
 		</pair>
 		<pair>
-			<title>Иностранный язык</title>
-			<lecturer>Стихова Ольга Владимировна</lecturer>
-			<type>Seminar</type>
-			<subgroup>Common</subgroup>
-			<classroom>238</classroom>
-			<time count="1">
-				<start>14:10</start>
-				<end>15:50</end>
-			</time>
-			<dates>
-				<date frequency="every">2019.02.04-2019.05.20</date>
-			</dates>
-		</pair>
-		<pair>
 			<title>Операционные системы</title>
 			<lecturer>Семячкова Елена Геннадьевна</lecturer>
 			<type>Laboratory</type>
 			<subgroup>A</subgroup>
 			<classroom>247</classroom>
-			<time count="1">
+			<time>
 				<start>16:00</start>
-				<end>17:40</end>
-			</time>
-			<dates>
-				<date frequency="throughout">2019.02.11-2019.03.25</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Операционные системы</title>
-			<lecturer>Семячкова Елена Геннадьевна</lecturer>
-			<type>Laboratory</type>
-			<subgroup>B</subgroup>
-			<classroom>247</classroom>
-			<time count="1">
-				<start>16:00</start>
-				<end>17:40</end>
-			</time>
-			<dates>
-				<date frequency="throughout">2019.02.18-2019.04.01</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Базы данных</title>
-			<lecturer>Бычкова Наталья Александровна</lecturer>
-			<type>Laboratory</type>
-			<subgroup>A</subgroup>
-			<classroom>247</classroom>
-			<time count="1">
-				<start>16:00</start>
-				<end>17:40</end>
-			</time>
-			<dates>
-				<date frequency="once">2019.04.08</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Базы данных</title>
-			<lecturer>Бычкова Наталья Александровна</lecturer>
-			<type>Laboratory</type>
-			<subgroup>B</subgroup>
-			<classroom>247</classroom>
-			<time count="1">
-				<start>16:00</start>
-				<end>17:40</end>
-			</time>
-			<dates>
-				<date frequency="once">2019.04.15</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Операционные системы</title>
-			<lecturer>Семячкова Елена Геннадьевна</lecturer>
-			<type>Laboratory</type>
-			<subgroup>A</subgroup>
-			<classroom>247</classroom>
-			<time count="1">
-				<start>18:00</start>
 				<end>19:30</end>
 			</time>
 			<dates>
@@ -119,8 +63,8 @@
 			<type>Laboratory</type>
 			<subgroup>B</subgroup>
 			<classroom>247</classroom>
-			<time count="1">
-				<start>18:00</start>
+			<time>
+				<start>16:00</start>
 				<end>19:30</end>
 			</time>
 			<dates>
@@ -133,8 +77,8 @@
 			<type>Laboratory</type>
 			<subgroup>A</subgroup>
 			<classroom>247</classroom>
-			<time count="1">
-				<start>18:00</start>
+			<time>
+				<start>16:00</start>
 				<end>19:30</end>
 			</time>
 			<dates>
@@ -147,8 +91,8 @@
 			<type>Laboratory</type>
 			<subgroup>B</subgroup>
 			<classroom>247</classroom>
-			<time count="1">
-				<start>18:00</start>
+			<time>
+				<start>16:00</start>
 				<end>19:30</end>
 			</time>
 			<dates>
@@ -158,12 +102,41 @@
 	</monday>
 	<tuesday>
 		<pair>
+			<title>Численные методы</title>
+			<lecturer>Третяк Ирина Сергеевна</lecturer>
+			<type>Lecture</type>
+			<subgroup>Common</subgroup>
+			<classroom>0204</classroom>
+			<time>
+				<start>16:00</start>
+				<end>17:40</end>
+			</time>
+			<dates>
+				<date frequency="once">2019.02.05</date>
+				<date frequency="once">2019.02.12</date>
+			</dates>
+		</pair>
+		<pair>
+			<title>Теория вероятностей и математическая статистика</title>
+			<lecturer>Казаков Олег Андреевич</lecturer>
+			<type>Lecture</type>
+			<subgroup>Common</subgroup>
+			<classroom>0811</classroom>
+			<time>
+				<start>14:10</start>
+				<end>15:50</end>
+			</time>
+			<dates>
+				<date frequency="every">2019.02.05-2019.05.07</date>
+			</dates>
+		</pair>
+		<pair>
 			<title>Компьютерная механика</title>
 			<lecturer>Чеканин Владислав Александрович</lecturer>
 			<type>Lecture</type>
 			<subgroup>Common</subgroup>
 			<classroom>0408</classroom>
-			<time count="1">
+			<time>
 				<start>10:20</start>
 				<end>12:00</end>
 			</time>
@@ -177,7 +150,7 @@
 			<type>Seminar</type>
 			<subgroup>Common</subgroup>
 			<classroom>341</classroom>
-			<time count="1">
+			<time>
 				<start>12:20</start>
 				<end>14:00</end>
 			</time>
@@ -191,7 +164,7 @@
 			<type>Seminar</type>
 			<subgroup>Common</subgroup>
 			<classroom>0810</classroom>
-			<time count="1">
+			<time>
 				<start>12:20</start>
 				<end>14:00</end>
 			</time>
@@ -200,72 +173,13 @@
 			</dates>
 		</pair>
 		<pair>
-			<title>Теория вероятностей и математическая статистика</title>
-			<lecturer>Казаков Олег Андреевич</lecturer>
-			<type>Lecture</type>
-			<subgroup>Common</subgroup>
-			<classroom>0811</classroom>
-			<time count="1">
-				<start>14:10</start>
-				<end>15:50</end>
-			</time>
-			<dates>
-				<date frequency="every">2019.02.05-2019.05.07</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Численные методы</title>
-			<lecturer>Третяк Ирина Сергеевна</lecturer>
-			<type>Lecture</type>
-			<subgroup>Common</subgroup>
-			<classroom>0204</classroom>
-			<time count="1">
-				<start>16:00</start>
-				<end>17:40</end>
-			</time>
-			<dates>
-				<date frequency="once">2019.02.05</date>
-				<date frequency="once">2019.02.12</date>
-			</dates>
-		</pair>
-		<pair>
 			<title>База данных</title>
 			<lecturer>Бычкова Наталья Александровна</lecturer>
 			<type>Laboratory</type>
 			<subgroup>B</subgroup>
 			<classroom>247</classroom>
-			<time count="1">
+			<time>
 				<start>16:00</start>
-				<end>17:40</end>
-			</time>
-			<dates>
-				<date frequency="once">2019.03.19</date>
-				<date frequency="once">2019.04.02</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Базы данных</title>
-			<lecturer>Бычкова Наталья Александровна</lecturer>
-			<type>Laboratory</type>
-			<subgroup>A</subgroup>
-			<classroom>247</classroom>
-			<time count="1">
-				<start>16:00</start>
-				<end>17:40</end>
-			</time>
-			<dates>
-				<date frequency="once">2019.03.12</date>
-				<date frequency="once">2019.03.26</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>База данных</title>
-			<lecturer>Бычкова Наталья Александровна</lecturer>
-			<type>Laboratory</type>
-			<subgroup>B</subgroup>
-			<classroom>247</classroom>
-			<time count="1">
-				<start>18:00</start>
 				<end>19:30</end>
 			</time>
 			<dates>
@@ -279,8 +193,8 @@
 			<type>Laboratory</type>
 			<subgroup>A</subgroup>
 			<classroom>247</classroom>
-			<time count="1">
-				<start>18:00</start>
+			<time>
+				<start>16:00</start>
 				<end>19:30</end>
 			</time>
 			<dates>
@@ -291,68 +205,12 @@
 	</tuesday>
 	<wednesday>
 		<pair>
-			<title>Численные методы</title>
-			<lecturer>Третяк Ирина Сергеевна</lecturer>
-			<type>Lecture</type>
-			<subgroup>Common</subgroup>
-			<classroom>0204</classroom>
-			<time count="1">
-				<start>8:30</start>
-				<end>10:10</end>
-			</time>
-			<dates>
-				<date frequency="every">2019.02.06-2019.03.20</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Компьютерная механика</title>
-			<lecturer>Чеканин Владислав Александрович</lecturer>
-			<type>Seminar</type>
-			<subgroup>Common</subgroup>
-			<classroom>408</classroom>
-			<time count="1">
-				<start>10:20</start>
-				<end>12:00</end>
-			</time>
-			<dates>
-				<date frequency="every">2019.02.13-2019.03.20</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Компьютерная механика</title>
-			<lecturer>Чеканин Владислав Александрович</lecturer>
-			<type>Lecture</type>
-			<subgroup>Common</subgroup>
-			<classroom>0309</classroom>
-			<time count="1">
-				<start>12:20</start>
-				<end>14:00</end>
-			</time>
-			<dates>
-				<date frequency="every">2019.02.06-2019.03.20</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Численные методы</title>
-			<lecturer>Третяк Ирина Сергеевна</lecturer>
-			<type>Lecture</type>
-			<subgroup>Common</subgroup>
-			<classroom>0204</classroom>
-			<time count="1">
-				<start>12:20</start>
-				<end>14:00</end>
-			</time>
-			<dates>
-				<date frequency="once">2019.03.27</date>
-			</dates>
-		</pair>
-		<pair>
 			<title>Прикладная физическая культура</title>
 			<lecturer>Хафизов Ринат Ильгамович</lecturer>
 			<type>Lecture</type>
 			<subgroup>Common</subgroup>
 			<classroom>С/3 СТАНКИН</classroom>
-			<time count="1">
+			<time>
 				<start>14:10</start>
 				<end>15:50</end>
 			</time>
@@ -361,12 +219,26 @@
 			</dates>
 		</pair>
 		<pair>
+			<title>Компьютерная механика</title>
+			<lecturer>Чеканин Владислав Александрович</lecturer>
+			<type>Lecture</type>
+			<subgroup>Common</subgroup>
+			<classroom>0309</classroom>
+			<time>
+				<start>12:20</start>
+				<end>14:00</end>
+			</time>
+			<dates>
+				<date frequency="every">2019.02.06-2019.03.20</date>
+			</dates>
+		</pair>
+		<pair>
 			<title>Прикладная физическая культура</title>
 			<lecturer>Хафизов Ринат Ильгамович</lecturer>
 			<type>Seminar</type>
 			<subgroup>Common</subgroup>
 			<classroom>С/3 СТАНКИН</classroom>
-			<time count="1">
+			<time>
 				<start>14:10</start>
 				<end>15:50</end>
 			</time>
@@ -378,40 +250,53 @@
 		<pair>
 			<title>Компьютерная механика</title>
 			<lecturer>Чеканин Владислав Александрович</lecturer>
-			<type>Laboratory</type>
-			<subgroup>B</subgroup>
-			<classroom>216</classroom>
-			<time count="1">
-				<start>16:00</start>
-				<end>17:40</end>
+			<type>Seminar</type>
+			<subgroup>Common</subgroup>
+			<classroom>408</classroom>
+			<time>
+				<start>10:20</start>
+				<end>12:00</end>
 			</time>
 			<dates>
-				<date frequency="throughout">2019.04.10-2019.05.22</date>
+				<date frequency="every">2019.02.13-2019.03.20</date>
+			</dates>
+		</pair>
+		<pair>
+			<title>Численные методы</title>
+			<lecturer>Третяк Ирина Сергеевна</lecturer>
+			<type>Lecture</type>
+			<subgroup>Common</subgroup>
+			<classroom>0204</classroom>
+			<time>
+				<start>8:30</start>
+				<end>10:10</end>
+			</time>
+			<dates>
+				<date frequency="every">2019.02.06-2019.03.20</date>
+			</dates>
+		</pair>
+		<pair>
+			<title>Численные методы</title>
+			<lecturer>Третяк Ирина Сергеевна</lecturer>
+			<type>Lecture</type>
+			<subgroup>Common</subgroup>
+			<classroom>0204</classroom>
+			<time>
+				<start>12:20</start>
+				<end>14:00</end>
+			</time>
+			<dates>
+				<date frequency="once">2019.03.27</date>
 			</dates>
 		</pair>
 		<pair>
 			<title>Компьютерная механика</title>
 			<lecturer>Чеканин Владислав Александрович</lecturer>
 			<type>Laboratory</type>
-			<subgroup>A</subgroup>
-			<classroom>216</classroom>
-			<time count="1">
-				<start>16:00</start>
-				<end>17:40</end>
-			</time>
-			<dates>
-				<date frequency="once">2019.04.17</date>
-				<date frequency="once">2019.05.15</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Компьютерная механика</title>
-			<lecturer>Чеканин Владислав Александрович</lecturer>
-			<type>Laboratory</type>
 			<subgroup>B</subgroup>
 			<classroom>216</classroom>
-			<time count="1">
-				<start>18:00</start>
+			<time>
+				<start>16:00</start>
 				<end>19:30</end>
 			</time>
 			<dates>
@@ -424,8 +309,8 @@
 			<type>Laboratory</type>
 			<subgroup>A</subgroup>
 			<classroom>216</classroom>
-			<time count="1">
-				<start>18:00</start>
+			<time>
+				<start>16:00</start>
 				<end>19:30</end>
 			</time>
 			<dates>
@@ -436,32 +321,59 @@
 	</wednesday>
 	<thursday>
 		<pair>
-			<title>Инновационные технологии и автоматизированные комплексы цифрового машиностроительного производства</title>
-			<lecturer>Солис Нестор Вашингтон</lecturer>
+			<title>Базы данных</title>
+			<lecturer>Бычкова Наталья Александровна</lecturer>
 			<type>Lecture</type>
 			<subgroup>Common</subgroup>
-			<classroom>0209</classroom>
-			<time count="1">
-				<start>8:30</start>
-				<end>10:10</end>
+			<classroom>0206</classroom>
+			<time>
+				<start>14:10</start>
+				<end>15:50</end>
 			</time>
 			<dates>
-				<date frequency="every">2019.02.07-2019.04.25</date>
+				<date frequency="once">2019.02.07</date>
 			</dates>
 		</pair>
 		<pair>
-			<title>Модели и методы теории вычислений</title>
-			<lecturer>Бритвина Валентина Валентиновна</lecturer>
+			<title>Экономика</title>
+			<lecturer>Крючкова Елена Вячеславовна</lecturer>
+			<type>Lecture</type>
+			<subgroup>Common</subgroup>
+			<classroom>0206</classroom>
+			<time>
+				<start>12:20</start>
+				<end>14:00</end>
+			</time>
+			<dates>
+				<date frequency="once">2019.02.07</date>
+			</dates>
+		</pair>
+		<pair>
+			<title>Базы данных</title>
+			<lecturer>Бычкова Наталья Александровна</lecturer>
 			<type>Lecture</type>
 			<subgroup>Common</subgroup>
 			<classroom>0207</classroom>
-			<time count="1">
-				<start>10:20</start>
-				<end>12:00</end>
+			<time>
+				<start>14:10</start>
+				<end>15:50</end>
 			</time>
 			<dates>
-				<date frequency="every">2019.02.07-2019.03.14</date>
-				<date frequency="every">2019.04.04-2019.04.25</date>
+				<date frequency="every">2019.02.14-2019.04.11</date>
+			</dates>
+		</pair>
+		<pair>
+			<title>Экономика</title>
+			<lecturer>Крючкова Елена Вячеславовна</lecturer>
+			<type>Lecture</type>
+			<subgroup>Common</subgroup>
+			<classroom>0408</classroom>
+			<time>
+				<start>12:20</start>
+				<end>14:00</end>
+			</time>
+			<dates>
+				<date frequency="every">2019.02.14-2019.04.11</date>
 			</dates>
 		</pair>
 		<pair>
@@ -470,7 +382,7 @@
 			<type>Lecture</type>
 			<subgroup>Common</subgroup>
 			<classroom>0208</classroom>
-			<time count="1">
+			<time>
 				<start>10:20</start>
 				<end>12:00</end>
 			</time>
@@ -480,31 +392,20 @@
 			</dates>
 		</pair>
 		<pair>
-			<title>Экономика</title>
-			<lecturer>Крючкова Елена Вячеславовна</lecturer>
-			<type>Lecture</type>
+			<title>Модели и методы теории вычислений</title>
+			<lecturer>Бритвина Валентина Валентиновна</lecturer>
+			<type>Seminar</type>
 			<subgroup>Common</subgroup>
-			<classroom>0206</classroom>
-			<time count="1">
-				<start>12:20</start>
-				<end>14:00</end>
+			<classroom>0811</classroom>
+			<time>
+				<start>14:10</start>
+				<end>15:50</end>
 			</time>
 			<dates>
-				<date frequency="once">2019.02.07</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Экономика</title>
-			<lecturer>Крючкова Елена Вячеславовна</lecturer>
-			<type>Lecture</type>
-			<subgroup>Common</subgroup>
-			<classroom>0408</classroom>
-			<time count="1">
-				<start>12:20</start>
-				<end>14:00</end>
-			</time>
-			<dates>
-				<date frequency="every">2019.02.14-2019.04.11</date>
+				<date frequency="once">2019.04.18</date>
+				<date frequency="once">2019.04.25</date>
+				<date frequency="once">2019.05.16</date>
+				<date frequency="once">2019.05.23</date>
 			</dates>
 		</pair>
 		<pair>
@@ -513,7 +414,7 @@
 			<type>Seminar</type>
 			<subgroup>Common</subgroup>
 			<classroom>0810</classroom>
-			<time count="1">
+			<time>
 				<start>12:20</start>
 				<end>14:00</end>
 			</time>
@@ -525,59 +426,74 @@
 			</dates>
 		</pair>
 		<pair>
-			<title>Базы данных</title>
-			<lecturer>Бычкова Наталья Александровна</lecturer>
-			<type>Lecture</type>
-			<subgroup>Common</subgroup>
-			<classroom>0206</classroom>
-			<time count="1">
-				<start>14:10</start>
-				<end>15:50</end>
-			</time>
-			<dates>
-				<date frequency="once">2019.02.07</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Базы данных</title>
-			<lecturer>Бычкова Наталья Александровна</lecturer>
+			<title>Модели и методы теории вычислений</title>
+			<lecturer>Бритвина Валентина Валентиновна</lecturer>
 			<type>Lecture</type>
 			<subgroup>Common</subgroup>
 			<classroom>0207</classroom>
-			<time count="1">
-				<start>14:10</start>
-				<end>15:50</end>
+			<time>
+				<start>10:20</start>
+				<end>12:00</end>
 			</time>
 			<dates>
-				<date frequency="every">2019.02.14-2019.04.11</date>
+				<date frequency="every">2019.02.07-2019.03.14</date>
+				<date frequency="every">2019.04.04-2019.04.25</date>
 			</dates>
 		</pair>
 		<pair>
-			<title>Модели и методы теории вычислений</title>
-			<lecturer>Бритвина Валентина Валентиновна</lecturer>
-			<type>Seminar</type>
+			<title>Инновационные технологии и автоматизированные комплексы цифрового машиностроительного производства</title>
+			<lecturer>Солис Нестор Вашингтон</lecturer>
+			<type>Lecture</type>
 			<subgroup>Common</subgroup>
-			<classroom>0811</classroom>
-			<time count="1">
-				<start>14:10</start>
-				<end>15:50</end>
+			<classroom>0209</classroom>
+			<time>
+				<start>8:30</start>
+				<end>10:10</end>
 			</time>
 			<dates>
-				<date frequency="once">2019.04.18</date>
-				<date frequency="once">2019.04.25</date>
-				<date frequency="once">2019.05.16</date>
-				<date frequency="once">2019.05.23</date>
+				<date frequency="every">2019.02.07-2019.04.25</date>
 			</dates>
 		</pair>
 	</thursday>
 	<friday>
+		<pair>
+			<title>Теория вероятностей и математическая статистика</title>
+			<lecturer>Девятерикова Елена Анатольевна</lecturer>
+			<type>Seminar</type>
+			<subgroup>Common</subgroup>
+			<classroom>0811</classroom>
+			<time>
+				<start>16:00</start>
+				<end>17:40</end>
+			</time>
+			<dates>
+				<date frequency="once">2019.05.17</date>
+			</dates>
+		</pair>
+		<pair>
+			<title>Теория вероятностей и математическая статистика</title>
+			<lecturer>Девятерикова Елена Анатольевна</lecturer>
+			<type>Seminar</type>
+			<subgroup>Common</subgroup>
+			<classroom>0811</classroom>
+			<time>
+				<start>14:10</start>
+				<end>15:50</end>
+			</time>
+			<dates>
+				<date frequency="every">2019.02.15-2019.03.01</date>
+				<date frequency="every">2019.03.15-2019.04.26</date>
+				<date frequency="once">2019.05.17</date>
+				<date frequency="once">2019.05.24</date>
+			</dates>
+		</pair>
 		<pair>
 			<title>Инновационные технологии и автоматизированные комплексы цифрового машиностроительного производства</title>
 			<lecturer>Пристинский Юрий Олегович</lecturer>
 			<type>Seminar</type>
 			<subgroup>Common</subgroup>
 			<classroom>341</classroom>
-			<time count="1">
+			<time>
 				<start>12:20</start>
 				<end>14:00</end>
 			</time>
@@ -592,7 +508,7 @@
 			<type>Seminar</type>
 			<subgroup>Common</subgroup>
 			<classroom>0811</classroom>
-			<time count="1">
+			<time>
 				<start>12:20</start>
 				<end>14:00</end>
 			</time>
@@ -601,89 +517,13 @@
 			</dates>
 		</pair>
 		<pair>
-			<title>Теория вероятностей и математическая статистика</title>
-			<lecturer>Девятерикова Елена Анатольевна</lecturer>
-			<type>Seminar</type>
-			<subgroup>Common</subgroup>
-			<classroom>0811</classroom>
-			<time count="1">
-				<start>14:10</start>
-				<end>15:50</end>
-			</time>
-			<dates>
-				<date frequency="every">2019.02.15-2019.03.01</date>
-				<date frequency="every">2019.03.15-2019.04.26</date>
-				<date frequency="once">2019.05.17</date>
-				<date frequency="once">2019.05.24</date>
-			</dates>
-		</pair>
-		<pair>
 			<title>Численные методы</title>
 			<lecturer>Третяк Ирина Сергеевна</lecturer>
 			<type>Laboratory</type>
 			<subgroup>A</subgroup>
 			<classroom>357(з)</classroom>
-			<time count="1">
+			<time>
 				<start>16:00</start>
-				<end>17:40</end>
-			</time>
-			<dates>
-				<date frequency="once">2019.03.22</date>
-				<date frequency="once">2019.04.05</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Численные методы</title>
-			<lecturer>Третяк Ирина Сергеевна</lecturer>
-			<type>Laboratory</type>
-			<subgroup>B</subgroup>
-			<classroom>357(з)</classroom>
-			<time count="1">
-				<start>16:00</start>
-				<end>17:40</end>
-			</time>
-			<dates>
-				<date frequency="once">2019.03.29</date>
-				<date frequency="once">2019.04.12</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Теория вероятностей и математическая статистика</title>
-			<lecturer>Девятерикова Елена Анатольевна</lecturer>
-			<type>Seminar</type>
-			<subgroup>Common</subgroup>
-			<classroom>0811</classroom>
-			<time count="1">
-				<start>16:00</start>
-				<end>17:40</end>
-			</time>
-			<dates>
-				<date frequency="once">2019.05.17</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Компьютерная механика</title>
-			<lecturer>Чеканин Владислав Александрович</lecturer>
-			<type>Laboratory</type>
-			<subgroup>A</subgroup>
-			<classroom>216</classroom>
-			<time count="1">
-				<start>16:00</start>
-				<end>17:40</end>
-			</time>
-			<dates>
-				<date frequency="once">2019.04.26</date>
-				<date frequency="once">2019.05.24</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Численные методы</title>
-			<lecturer>Третяк Ирина Сергеевна</lecturer>
-			<type>Laboratory</type>
-			<subgroup>A</subgroup>
-			<classroom>357(з)</classroom>
-			<time count="1">
-				<start>18:00</start>
 				<end>19:30</end>
 			</time>
 			<dates>
@@ -697,8 +537,8 @@
 			<type>Laboratory</type>
 			<subgroup>B</subgroup>
 			<classroom>357(з)</classroom>
-			<time count="1">
-				<start>18:00</start>
+			<time>
+				<start>16:00</start>
 				<end>19:30</end>
 			</time>
 			<dates>
@@ -712,8 +552,8 @@
 			<type>Laboratory</type>
 			<subgroup>A</subgroup>
 			<classroom>216</classroom>
-			<time count="1">
-				<start>18:00</start>
+			<time>
+				<start>16:00</start>
 				<end>19:30</end>
 			</time>
 			<dates>
@@ -724,117 +564,12 @@
 	</friday>
 	<saturday>
 		<pair>
-			<title>Модели и методы теории вычислений</title>
-			<lecturer>Бритвина Валентина Валентиновна</lecturer>
-			<type>Laboratory</type>
-			<subgroup>A</subgroup>
-			<classroom>Читальный зал</classroom>
-			<time count="1">
-				<start>8:30</start>
-				<end>10:10</end>
-			</time>
-			<dates>
-				<date frequency="once">2019.03.30</date>
-				<date frequency="once">2019.04.13</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Модели и методы теории вычислений</title>
-			<lecturer>Бритвина Валентина Валентиновна</lecturer>
-			<type>Laboratory</type>
-			<subgroup>A</subgroup>
-			<classroom>216</classroom>
-			<time count="1">
-				<start>8:30</start>
-				<end>10:10</end>
-			</time>
-			<dates>
-				<date frequency="once">2019.04.27</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Модели и методы теории вычислений</title>
-			<lecturer>Бритвина Валентина Валентиновна</lecturer>
-			<type>Laboratory</type>
-			<subgroup>B</subgroup>
-			<classroom>Читальный зал</classroom>
-			<time count="1">
-				<start>8:30</start>
-				<end>10:10</end>
-			</time>
-			<dates>
-				<date frequency="throughout">2019.03.23-2019.04.20</date>
-				<date frequency="once">2019.05.18</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Модели и методы теории вычислений</title>
-			<lecturer>Бритвина Валентина Валентиновна</lecturer>
-			<type>Laboratory</type>
-			<subgroup>A</subgroup>
-			<classroom>Читальный зал</classroom>
-			<time count="1">
-				<start>10:20</start>
-				<end>12:00</end>
-			</time>
-			<dates>
-				<date frequency="once">2019.03.30</date>
-				<date frequency="once">2019.04.13</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Модели и методы теории вычислений</title>
-			<lecturer>Бритвина Валентина Валентиновна</lecturer>
-			<type>Laboratory</type>
-			<subgroup>A</subgroup>
-			<classroom>216</classroom>
-			<time count="1">
-				<start>10:20</start>
-				<end>12:00</end>
-			</time>
-			<dates>
-				<date frequency="once">2019.04.27</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Модели и методы теории вычислений</title>
-			<lecturer>Бритвина Валентина Валентиновна</lecturer>
-			<type>Laboratory</type>
-			<subgroup>B</subgroup>
-			<classroom>Читальный зал</classroom>
-			<time count="1">
-				<start>10:20</start>
-				<end>12:00</end>
-			</time>
-			<dates>
-				<date frequency="throughout">2019.03.23-2019.04.20</date>
-				<date frequency="once">2019.05.18</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Операционный системы</title>
-			<lecturer>Пушкин Алексей Юрьевич</lecturer>
-			<type>Lecture</type>
-			<subgroup>Common</subgroup>
-			<classroom>0411</classroom>
-			<time count="1">
-				<start>12:20</start>
-				<end>14:00</end>
-			</time>
-			<dates>
-				<date frequency="once">2019.04.20</date>
-				<date frequency="once">2019.04.27</date>
-				<date frequency="once">2019.05.18</date>
-				<date frequency="once">2019.05.25</date>
-			</dates>
-		</pair>
-		<pair>
 			<title>Операционные системы</title>
 			<lecturer>Пушкин Алексей Юрьевич</lecturer>
 			<type>Lecture</type>
 			<subgroup>Common</subgroup>
 			<classroom>0411</classroom>
-			<time count="1">
+			<time>
 				<start>14:10</start>
 				<end>15:50</end>
 			</time>
@@ -847,46 +582,19 @@
 			</dates>
 		</pair>
 		<pair>
-			<title>Модели и методы теории вычислений</title>
-			<lecturer>Бритвина Валентина Валентиновна</lecturer>
-			<type>Laboratory</type>
-			<subgroup>A</subgroup>
-			<classroom>216</classroom>
-			<time count="1">
-				<start>16:00</start>
-				<end>17:40</end>
+			<title>Операционный системы</title>
+			<lecturer>Пушкин Алексей Юрьевич</lecturer>
+			<type>Lecture</type>
+			<subgroup>Common</subgroup>
+			<classroom>0411</classroom>
+			<time>
+				<start>12:20</start>
+				<end>14:00</end>
 			</time>
 			<dates>
-				<date frequency="once">2019.03.16</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Инновационные технологии и автоматизированные комплексы цифрового машиностроительного производства</title>
-			<lecturer>Пристинский Юрий Олегович</lecturer>
-			<type>Laboratory</type>
-			<subgroup>A</subgroup>
-			<classroom>235(в)</classroom>
-			<time count="1">
-				<start>16:00</start>
-				<end>17:40</end>
-			</time>
-			<dates>
-				<date frequency="throughout">2019.03.23-2019.04.20</date>
+				<date frequency="once">2019.04.20</date>
+				<date frequency="once">2019.04.27</date>
 				<date frequency="once">2019.05.18</date>
-			</dates>
-		</pair>
-		<pair>
-			<title>Инновационные технологии и автоматизированные комплексы цифрового машиностроительного производства</title>
-			<lecturer>Пристинский Юрий Олегович</lecturer>
-			<type>Laboratory</type>
-			<subgroup>B</subgroup>
-			<classroom>235(в)</classroom>
-			<time count="1">
-				<start>16:00</start>
-				<end>17:40</end>
-			</time>
-			<dates>
-				<date frequency="throughout">2019.03.30-2019.04.27</date>
 				<date frequency="once">2019.05.25</date>
 			</dates>
 		</pair>
@@ -896,12 +604,56 @@
 			<type>Laboratory</type>
 			<subgroup>A</subgroup>
 			<classroom>216</classroom>
-			<time count="1">
-				<start>18:00</start>
+			<time>
+				<start>16:00</start>
 				<end>19:30</end>
 			</time>
 			<dates>
 				<date frequency="once">2019.03.16</date>
+			</dates>
+		</pair>
+		<pair>
+			<title>Модели и методы теории вычислений</title>
+			<lecturer>Бритвина Валентина Валентиновна</lecturer>
+			<type>Laboratory</type>
+			<subgroup>A</subgroup>
+			<classroom>Читальный зал</classroom>
+			<time>
+				<start>8:30</start>
+				<end>12:00</end>
+			</time>
+			<dates>
+				<date frequency="once">2019.03.30</date>
+				<date frequency="once">2019.04.13</date>
+			</dates>
+		</pair>
+		<pair>
+			<title>Модели и методы теории вычислений</title>
+			<lecturer>Бритвина Валентина Валентиновна</lecturer>
+			<type>Laboratory</type>
+			<subgroup>A</subgroup>
+			<classroom>216</classroom>
+			<time>
+				<start>8:30</start>
+				<end>12:00</end>
+			</time>
+			<dates>
+				<date frequency="once">2019.04.27</date>
+			</dates>
+		</pair>
+		<pair>
+			<title>Модели и методы теории вычислений</title>
+			<lecturer>Бритвина Валентина Валентиновна</lecturer>
+			<type>Laboratory</type>
+			<subgroup>B</subgroup>
+			<classroom>Читальный зал</classroom>
+			<time>
+				<start>8:30</start>
+				<end>12:00</end>
+			</time>
+			<dates>
+				<date frequency="throughout">2019.03.23-2019.04.20</date>
+				<date frequency="once">2019.05.18</date>
 			</dates>
 		</pair>
 		<pair>
@@ -910,8 +662,8 @@
 			<type>Laboratory</type>
 			<subgroup>A</subgroup>
 			<classroom>235(в)</classroom>
-			<time count="1">
-				<start>18:00</start>
+			<time>
+				<start>16:00</start>
 				<end>19:30</end>
 			</time>
 			<dates>
@@ -925,8 +677,8 @@
 			<type>Laboratory</type>
 			<subgroup>B</subgroup>
 			<classroom>235(в)</classroom>
-			<time count="1">
-				<start>18:00</start>
+			<time>
+				<start>16:00</start>
 				<end>19:30</end>
 			</time>
 			<dates>
