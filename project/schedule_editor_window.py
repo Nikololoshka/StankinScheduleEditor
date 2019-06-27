@@ -421,6 +421,8 @@ class ScheduleEditorWindow(QMainWindow):
         settings = SettingsWindow(self)
         settings.exec_()
 
+        self.update_table_widget()
+
     def action_about_clicked(self) -> None:
         """
         Slot display window: "About program".

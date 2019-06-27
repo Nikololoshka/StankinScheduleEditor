@@ -3,6 +3,7 @@
 # imports
 from xml.etree import ElementTree as Xml
 from project.pair.attrib_pair import AttribPair
+from project.settings import Settings
 
 
 class LecturerPair(AttribPair):
@@ -42,4 +43,10 @@ class LecturerPair(AttribPair):
         return self._lecturer != ""
 
     def __str__(self):
-        return self._lecturer
+        if Settings.ShortName:
+            lst = self._lecturer.replace(".", " ").split()
+            lecturer = lst[0]
+            lecturer += " " + ".".join(word[0] for word in lst[1:])
+            return lecturer
+        else:
+            return self._lecturer

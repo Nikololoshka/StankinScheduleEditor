@@ -2,7 +2,7 @@
 
 # imports
 from PyQt5.QtWidgets import QWidget, QDialog, QGroupBox, QComboBox, QFormLayout, qApp, \
-                            QLabel, QVBoxLayout, QHBoxLayout, QPushButton
+                            QLabel, QVBoxLayout, QHBoxLayout, QPushButton, QCheckBox
 from PyQt5.QtCore import Qt, QSettings, QTranslator, QEvent
 
 # importing resources
@@ -46,6 +46,17 @@ class SettingsWindow(QDialog):
             if Settings.ScheduleLang == lang_code:
                 self.combo_box_sch_lang.setCurrentText(lang_name)
 
+        # schedule
+        self.group_box_schedule = QGroupBox(self.tr("Schedule"))
+        self.form_layout_schedule = QFormLayout(self.group_box_schedule)
+
+        self.label_short_name = QLabel(self.tr("Short name"))
+        self.form_layout_schedule.setWidget(0, QFormLayout.LabelRole, self.label_short_name)
+        self.check_box_short_name = QCheckBox()
+        self.form_layout_schedule.setWidget(0, QFormLayout.FieldRole, self.check_box_short_name)
+
+        self.check_box_short_name.setChecked(Settings.ShortName)
+
         # navigate
         self.layout_navigate = QHBoxLayout()
         self.layout_navigate.addStretch(1)
@@ -63,6 +74,7 @@ class SettingsWindow(QDialog):
         self.layout_main = QVBoxLayout()
 
         self.layout_main.addWidget(self.group_box_lang)
+        self.layout_main.addWidget(self.group_box_schedule)
         self.layout_main.addLayout(self.layout_navigate)
 
         self.setLayout(self.layout_main)
@@ -70,6 +82,8 @@ class SettingsWindow(QDialog):
         # connection
         self.combo_box_app_lang.currentTextChanged.connect(self.application_lang_changed)
         self.combo_box_sch_lang.currentTextChanged.connect(self.schedule_lang_changed)
+
+        self.check_box_short_name.clicked.connect(self.short_name_checked)
 
         self.push_button_ok.clicked.connect(self.close)
         self.push_button_apply.clicked.connect(self.close)
@@ -117,6 +131,12 @@ class SettingsWindow(QDialog):
         qApp.installTranslator(translator)
         Settings.ScheduleTranslator = translator
 
+    def short_name_checked(self) -> None:
+        """
+        Method to change the display mode of names.
+        """
+        Settings.ShortName = int(self.check_box_short_name.isChecked())
+
 
 class Settings:
     """
@@ -124,6 +144,7 @@ class Settings:
     """
     ApplicationLang = "en_US"
     ScheduleLang = "en_US"
+    ShortName = 0
 
     ApplicationTranslator = None
     ScheduleTranslator = None
@@ -143,6 +164,7 @@ class Settings:
         settings.beginGroup("Application")
         Settings.ApplicationLang = settings.value("application-lang", "en_US")
         Settings.ScheduleLang = settings.value("schedule-lang", "en_US")
+        Settings.ShortName = int(settings.value("short-name", 0))
         settings.endGroup()
 
     @staticmethod
@@ -154,5 +176,6 @@ class Settings:
         settings.beginGroup("Application")
         settings.setValue("application-lang", Settings.ApplicationLang)
         settings.setValue("schedule-lang", Settings.ScheduleLang)
+        settings.setValue("short-name", Settings.ShortName)
         settings.endGroup()
         settings.sync()
