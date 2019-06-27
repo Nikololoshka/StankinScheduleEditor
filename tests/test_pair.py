@@ -66,7 +66,7 @@ class TestPair(TestCase):
         pass
 
     def test_time_pair(self):
-        example = "<time count=\"1\">" \
+        example = "<time>" \
                   "<start>12:20</start>" \
                   "<end>14:00</end>" \
                   "</time>"
