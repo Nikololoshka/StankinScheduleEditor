@@ -42,7 +42,9 @@ class SubgroupPairAttribTranslator(QObject):
 
 
 class SubgroupPair(AttribPair):
-    """ Class describing the subgroup of a student pair """
+    """
+    Class describing the subgroup of a student pair.
+    """
     def __init__(self, subgroup: SubgroupPairAttrib = SubgroupPairAttrib.Common):
         super().__init__()
         self._subgroup: SubgroupPairAttrib = subgroup
@@ -54,15 +56,23 @@ class SubgroupPair(AttribPair):
         return subgroup
 
     def set_subgroup(self, subgroup: SubgroupPairAttrib):
-        """ Sets the value of subgroup """
+        """
+        Sets the value of subgroup.
+
+        :param subgroup: Subgroup value
+        """
         self._subgroup = subgroup
 
     def get_subgroup(self):
-        """ Returns the value of subgroup """
+        """
+        Returns the value of subgroup.
+        """
         return self._subgroup
 
     def is_separate(self):
-        """ Returns True/False depending on whether the student pair is separate by subgroup """
+        """
+        Returns True/False depending on whether the student pair is separate by subgroup.
+        """
         if self._subgroup == SubgroupPairAttrib.A or \
                 self._subgroup == SubgroupPairAttrib.B:
             return True

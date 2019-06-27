@@ -9,7 +9,9 @@ from enum import Enum
 
 
 class DaysOfWeek(Enum):
-    """ Enum describing student days of the week """
+    """
+    Enum describing student days of the week.
+    """
     Monday = "monday"
     Tuesday = "tuesday"
     Wednesday = "wednesday"
@@ -18,7 +20,9 @@ class DaysOfWeek(Enum):
     Saturday = "saturday"
 
     def index_of(self) -> int:
-        """ Returns the day of the week in order """
+        """
+        Returns the day of the week in order.
+        """
         for i, day in enumerate(DaysOfWeek.__members__.values()):
             if self == day:
                 return i
@@ -27,7 +31,10 @@ class DaysOfWeek(Enum):
 
     @staticmethod
     def value_of(index: int):
-        """ Returns the day of the week by its number """
+        """
+        Returns the day of the week by its number.
+        :param index: Index of day
+        """
         for i, day in enumerate(DaysOfWeek.__members__.values()):
             if i == index:
                 return day
@@ -35,8 +42,10 @@ class DaysOfWeek(Enum):
         raise InvalidDatePair("Wrong day of the week")
 
     @staticmethod
-    def to_list():
-        """ Returns a list of the names of the days of the week """
+    def to_list() -> list:
+        """
+        Returns a list of the names of the days of the week.
+        """
         return [str(name) for name in DaysOfWeek.__members__.values()]
 
     def __str__(self) -> str:
@@ -45,9 +54,14 @@ class DaysOfWeek(Enum):
 
 
 class DaysOfWeekTranslator(QObject):
-    """ A helper class to translate the enumeration of the days of the week """
+    """
+    A helper class to translate the enumeration of the days of the week.
+    """
     def translate(self, day: DaysOfWeek) -> str:
-        """ Returns the translation of the day of the week """
+        """
+        Returns the translation of the day of the week.
+        :param day: Day of week
+        """
         return {
             DaysOfWeek.Monday: self.tr("Monday"),
             DaysOfWeek.Tuesday: self.tr("Tuesday"),
@@ -59,14 +73,18 @@ class DaysOfWeekTranslator(QObject):
 
 
 class FrequencyDate(Enum):
-    """ Enum describing the frequency of student classes """
+    """
+    Enum describing the frequency of student classes.
+    """
     Once = "once"
     Every = "every"
     Throughout = "throughout"
 
     @staticmethod
     def value_of(s: str):
-        """ Returns the frequency of a pair by its string representation """
+        """
+        Returns the frequency of a pair by its string representation.
+        """
         return FrequencyDate.__members__[s.title()]
 
     def __str__(self):
@@ -75,9 +93,13 @@ class FrequencyDate(Enum):
 
 
 class FrequencyDateTranslator(QObject):
-    """ A helper class to translate the enumeration of the frequency of student classes """
+    """
+    A helper class to translate the enumeration of the frequency of student classes.
+    """
     def translate(self, frequency: FrequencyDate) -> str:
-        """ Returns the translation of the frequency of student classes """
+        """
+        Returns the translation of the frequency of student classes.
+        """
         return {
             FrequencyDate.Once: self.tr(""),
             FrequencyDate.Every: self.tr("e.w."),
@@ -86,7 +108,9 @@ class FrequencyDateTranslator(QObject):
 
 
 class InvalidDatePair(Exception):
-    """ Class that describes errors associated with the date """
+    """
+    Class that describes errors associated with the date.
+    """
     def __init__(self, msg):
         self._msg = msg
 
@@ -95,7 +119,9 @@ class InvalidDatePair(Exception):
 
 
 class DateItem:
-    """ Class that describes the element of dates """
+    """
+    Class that describes the element of dates.
+    """
     def __init__(self, str_date):
         self.date: str = str_date
 
@@ -104,21 +130,30 @@ class DateItem:
         """
         Returns a compact representation of the date. I.e. "%d.%m"
         Example: 2019.02.24 -> 24.02
+
+        :param date_str: Input string of date
         """
         return datetime.strptime(date_str, "%Y.%m.%d").strftime("%d.%m")
 
     def save(self) -> Xml.Element:
-        """ Save DateItem to XML file """
+        """
+        Save DateItem to XML file
+        """
         element = Xml.Element("date", {"frequency": FrequencyDate.Once.value})
         element.text = self.date
         return element
 
     def get_week_day(self) -> str:
-        """ Returns the day of the week date """
+        """
+        Returns the day of the week date
+         """
         index_day = datetime.strptime(self.date, "%Y.%m.%d").weekday()
         return DaysOfWeek.value_of(index_day)
 
     def copy(self):
+        """
+        Returns a copy of the date.
+        """
         new_date = DateItem(self.date)
         return new_date
 
@@ -187,24 +222,33 @@ class DateItem:
 
 
 class DateRange:
-    """ Class that describes the date range """
+    """
+    Class that describes the date range.
+    """
     def __init__(self, date_from, date_to, frequency):
         self.date_from: str = date_from
         self.date_to: str = date_to
         self.frequency: FrequencyDate = frequency
 
     def save(self) -> Xml.Element:
-        """ Save DateItem to XML file """
+        """
+        Save DateItem to XML file.
+        """
         element = Xml.Element("date", {"frequency": self.frequency.value})
         element.text = "{}-{}".format(self.date_from, self.date_to)
         return element
 
     def get_week_day(self) -> str:
-        """ Returns the day of the week date """
+        """
+        Returns the day of the week date.
+        """
         index_day = datetime.strptime(self.date_from, "%Y.%m.%d").weekday()
         return DaysOfWeek.value_of(index_day)
 
     def copy(self):
+        """
+        Returns a copy of the date.
+        """
         new_date = DateRange(self.date_from,
                              self.date_to,
                              self.frequency)
@@ -298,7 +342,9 @@ class DateRange:
 
 
 class DatePair(AttribPair):
-    """ Class describing the dates of student pairs """
+    """
+    Class describing the dates of student pairs.
+    """
     def __init__(self):
         super().__init__()
         self._dates = list()
@@ -337,11 +383,17 @@ class DatePair(AttribPair):
         return len(self._dates) != 0
 
     def get_week_day(self) -> DaysOfWeek:
-        """ Returns the day of the week date """
+        """
+        Returns the day of the week date.
+        """
         return self._week_day
 
     def add_date(self, date_item) -> None:
-        """ Adds a date to the list of dates """
+        """
+        Adds a date to the list of dates.
+
+        :param date_item: Added date
+        """
         if self._week_day is None:
             self._week_day = date_item.get_week_day()
         else:
@@ -360,7 +412,11 @@ class DatePair(AttribPair):
         self._dates.insert(i, date_item)
 
     def remove_date(self, date_item) -> None:
-        """ Removes a date from the date list """
+        """
+        Removes a date from the date list.
+
+        :param date_item: Removed date
+        """
         self._dates.remove(date_item)
         if len(self._dates) == 0:
             self._week_day = None

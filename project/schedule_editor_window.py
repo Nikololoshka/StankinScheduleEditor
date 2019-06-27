@@ -10,18 +10,21 @@ from PyQt5.QtGui import QFont, QFontMetrics, QIcon, QResizeEvent
 from project.pair_selector_window import PairSelectorWindow
 from project.export_window import ExportWindow
 from project.settings import SettingsWindow
-from project.schedule import Schedule
-from project.pair import DaysOfWeek
-from project import defaults
+from project.schedule import Schedule, AlongTwoPairsException
+from project.pair import DaysOfWeek, TimePair
 
 
 def compute_font_for_text(text: str, flags: int, size: QSize) -> QFont:
     """
-    Calculates the font for the text for the area of the specified dimensions.
-    Returns the font
+    Calculates the font for the text for the area of the specified dimensions
+
+    :param text: input text
+    :param flags: the alignment flags of the text
+    :param size: the size of the area
+    :return: QFont
     """
     font = qApp.font()
-    for i in range(1, 14):
+    for i in range(2, 14):
         font.setPixelSize(i)
         rect = QFontMetrics(font).boundingRect(0, 0, size.width(), size.height(), flags, text)
         if rect.width() > size.width() or rect.height() > size.height():
@@ -32,18 +35,33 @@ def compute_font_for_text(text: str, flags: int, size: QSize) -> QFont:
 
 
 class CustomHeaderView(QHeaderView):
-    """ HeaderView class with vertical text support """
-    def __init__(self, orientation):
+    """
+    HeaderView class with vertical text support
+    """
+    def __init__(self, orientation, indexes: list = None):
         super().__init__(orientation)
+        self._indexes_ref = indexes
 
     def paintSection(self, painter, rect, index) -> None:
         painter.save()
         if self.orientation() == Qt.Vertical:
+            new_index = index
+            for i, value in enumerate(self._indexes_ref):
+                new_index -= value
+                if new_index < 0:
+                    index = new_index + value + 1
+                    new_index = i
+                    break
+
+            delta = self._indexes_ref[new_index] - index
+            index = self._indexes_ref[new_index]
+            data = self.model().headerData(new_index, self.orientation(), Qt.DisplayRole)
             painter.translate(rect.x() + rect.width(), rect.y() + rect.height())
             painter.rotate(-90)
-            painter.drawText(QRectF(0, 0, rect.height(), -rect.width()),
+            painter.drawText(QRectF(-rect.height() * delta, 0, rect.height() * index, -rect.width()),
                              Qt.AlignCenter,
-                             self.model().headerData(index, self.orientation(), Qt.DisplayRole))
+                             data)
+
         else:
             painter.drawText(QRectF(rect.x(), rect.y(), rect.width(), rect.height()),
                              Qt.AlignCenter,
@@ -52,12 +70,15 @@ class CustomHeaderView(QHeaderView):
 
 
 class ScheduleEditorWindow(QMainWindow):
-    """ Class describing the main window of the program """
+    """
+    Class describing the main window of the program.
+    """
     def __init__(self):
         super().__init__()
 
-        self.schedule = Schedule()
-        self.file = None
+        self._schedule = Schedule()
+        self._indexes_ref = self._schedule.indexes()
+        self._file = None
 
         # window settings
         self.setWindowTitle(self.tr("Schedule Editor"))
@@ -65,7 +86,7 @@ class ScheduleEditorWindow(QMainWindow):
 
         # central widget settings
         self.table_widget = QTableWidget()
-        self.table_widget.setVerticalHeader(CustomHeaderView(Qt.Vertical))
+        self.table_widget.setVerticalHeader(CustomHeaderView(Qt.Vertical, self._indexes_ref))
         self.table_widget.setHorizontalHeader(CustomHeaderView(Qt.Horizontal))
         self.table_widget.setWordWrap(True)
         self.table_widget.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -73,18 +94,20 @@ class ScheduleEditorWindow(QMainWindow):
         self.table_widget.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table_widget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table_widget.horizontalHeader().setMaximumHeight(25)
-        self.table_widget.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.table_widget.horizontalHeader().setStretchLastSection(True)
+        self.table_widget.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.table_widget.verticalHeader().setMaximumWidth(25)
+        self.table_widget.verticalHeader().setStretchLastSection(True)
         self.table_widget.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
         self.table_widget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.table_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        self.table_widget.setColumnCount(8)
+        self.table_widget.setColumnCount(self._schedule.columns())
         for i in range(8):
-            item = QTableWidgetItem(defaults.get_time_start_end(i))
+            item = QTableWidgetItem(TimePair.time_start_end(i))
             self.table_widget.setHorizontalHeaderItem(i, item)
 
-        self.table_widget.setRowCount(6)
+        self.table_widget.setRowCount(self._schedule.rows())
         for i, day in enumerate(DaysOfWeek.to_list()):
             item = QTableWidgetItem(day)
             self.table_widget.setVerticalHeaderItem(i, item)
@@ -140,8 +163,15 @@ class ScheduleEditorWindow(QMainWindow):
         self.action_about.triggered.connect(self.action_about_clicked)
         self.action_exit.triggered.connect(self.close)
 
+        # self.table_widget.clicked.connect(self.test)
         self.table_widget.doubleClicked.connect(self.cell_clicked)
         self.table_widget.customContextMenuRequested.connect(self.context_menu_requested)
+
+    # def test(self) -> None:
+    #    """
+    #    Method for tests.
+    #    """
+    #    print(self.table_widget.currentRow(), self.table_widget.currentColumn())
 
     def changeEvent(self, event: QEvent) -> None:
         if event.type() == QEvent.LanguageChange:
@@ -165,11 +195,42 @@ class ScheduleEditorWindow(QMainWindow):
             super().changeEvent(event)
 
     def resizeEvent(self, a0: QResizeEvent) -> None:
-        self.update_table_widget()
+        self.resize_table_widget()
         super().resizeEvent(a0)
 
+    def resize_table_widget(self) -> None:
+        """
+        Method for resizing a table.
+        """
+        simple_row = (self.table_widget.height() - self.table_widget.horizontalHeader().height()) / 6
+        for i in range(self.table_widget.rowCount()):
+            new_index = i
+            for k, value in enumerate(self._indexes_ref):
+                new_index -= value
+                if new_index < 0:
+                    new_index = k
+                    break
+            size = int(simple_row / self._indexes_ref[new_index])
+            self.table_widget.verticalHeader().resizeSection(i, size)
+
+        for i in range(self.table_widget.rowCount()):
+            for j in range(self.table_widget.columnCount()):
+                item = self.table_widget.item(i, j)
+                if item is not None:
+                    size = QSize(self.table_widget.columnWidth(item.column()) *
+                                 self.table_widget.columnSpan(item.row(), item.column()),
+                                 self.table_widget.rowHeight(item.row()) *
+                                 self.table_widget.rowSpan(item.row(), item.column()))
+                    item.setFont(compute_font_for_text(item.text(),
+                                                       Qt.AlignTop | Qt.AlignLeft | Qt.TextWordWrap,
+                                                       size))
+
     def context_menu_requested(self, pos: QPoint) -> None:
-        """ Create a context menu to edit a table cell """
+        """
+        Create a context menu to edit a table cell.
+
+        :param pos: Menu call position
+        """
         menu = QMenu(self)
 
         action_edit = QAction(QIcon.fromTheme("accessories-text-editor"), self.tr("Edit cell"), self)
@@ -179,33 +240,93 @@ class ScheduleEditorWindow(QMainWindow):
         menu.popup(self.table_widget.viewport().mapToGlobal(pos))
 
     def update_table_widget(self) -> None:
-        """ Updates the schedule table """
-        for i, day in enumerate(self.schedule.schedule_list.values()):
-            for j, times in enumerate(day.values()):
-                text = ""
-                for k, pair in enumerate(times):
-                    text += str(pair) + "\n"
+        """
+        Updates the schedule table.
+        """
+        self.table_widget.clearSpans()
+        self.table_widget.clearContents()
 
-                item = QTableWidgetItem(text)
-                item.setTextAlignment(Qt.AlignTop | Qt.AlignLeft)
-                font = compute_font_for_text(item.text(),
-                                             Qt.AlignTop | Qt.AlignLeft | Qt.TextWordWrap,
-                                             self.cell_size(j, i))
-                item.setFont(font)
+        rows = self._schedule.rows()
+        columns = self._schedule.columns()
 
-                self.table_widget.setItem(i, j, item)
+        self.table_widget.setRowCount(rows)
+        self.table_widget.setColumnCount(columns)
 
-    def cell_size(self, column, row) -> QSize:
-        """ Returns the size of the cell """
-        return QSize(self.table_widget.columnWidth(column),
-                     self.table_widget.rowHeight(row))
+        i = 0
+        for day_number, schedule_element in enumerate(self._schedule):
+            min_i = i
+            for line in schedule_element:
+                j = 0
+                while j < columns:
+                    text = ""
+                    duration = 1
+
+                    pairs = line.get(j)
+                    if pairs is not None:
+                        duration = pairs[0]["time"].duration()
+                        for pair in pairs:
+                            text += str(pair) + "\n"
+
+                    item = QTableWidgetItem(text)
+                    item.setTextAlignment(Qt.AlignTop | Qt.AlignLeft)
+                    item.setData(Qt.UserRole, duration)
+                    self.table_widget.setItem(i, j, item)
+
+                    j += duration
+                i += 1
+
+            for n in range(columns):
+                for m in range(i - 1, min_i - 1, -1):
+                    item = self.table_widget.item(m, n)
+                    if item is not None:
+                        up_level, down_level = m, m
+                        duration = item.data(Qt.UserRole)
+                        # down
+                        for p in range(m + 1, i):
+                            free = True
+                            for r in range(duration):
+                                cmp_item = self.table_widget.item(p, n + r)
+                                if cmp_item is None or cmp_item.text() != "":
+                                    free = False
+                                    break
+                            if free:
+                                down_level = p
+                                for r in range(duration):
+                                    self.table_widget.takeItem(p, n + r)
+                            else:
+                                break
+                        # up
+                        for p in range(m - 1, min_i - 1, -1):
+                            free = True
+                            for r in range(duration):
+                                cmp_item = self.table_widget.item(p, n + r)
+                                if cmp_item is None or cmp_item.text() != "":
+                                    free = False
+                                    break
+                            if free:
+                                up_level = p
+                                for r in range(duration):
+                                    self.table_widget.takeItem(p, n + r)
+                            else:
+                                break
+
+                        if (abs(up_level - down_level) + 1) > 1 or duration > 1:
+                            self.table_widget.setItem(up_level,
+                                                      n,
+                                                      self.table_widget.takeItem(m, n))
+                            self.table_widget.setSpan(up_level,
+                                                      n,
+                                                      abs(up_level - down_level) + 1,
+                                                      duration)
+
+        self.resize_table_widget()
 
     def action_new_file_clicked(self) -> bool:
         """
         Slot to handle file save, after changes.
         If the user has agreed to save / not save, then True is returned, otherwise False.
         """
-        if self.schedule.is_change():
+        if self._schedule.is_change():
             answer = QMessageBox.warning(self,
                                          self.tr("The document has been modified"),
                                          self.tr("Do you want to save the changes you made?\n"
@@ -218,14 +339,16 @@ class ScheduleEditorWindow(QMainWindow):
             elif answer == QMessageBox.Cancel:
                 return False
 
-        self.schedule.clear()
+        self._schedule.clear()
         self.update_table_widget()
         self.setWindowTitle(self.tr("Schedule Editor"))
         return True
 
     def action_open_clicked(self) -> None:
-        """ Slot to handle file upload. """
-        if self.file is not None:
+        """
+        Slot to handle file upload.
+        """
+        if self._file is not None:
             if not self.action_new_file_clicked():
                 return
 
@@ -236,23 +359,39 @@ class ScheduleEditorWindow(QMainWindow):
         if path == "":
             return
 
-        self.schedule.load(path)
-        self.file = QFileInfo(path)
+        try:
+            self._schedule.load(path)
+        except AlongTwoPairsException as ex:
+            QMessageBox.critical(self,
+                                 self.tr("AlongTwoPairsException!"),
+                                 str(ex))
+            return
+        except Exception as ex:
+            QMessageBox.critical(self,
+                                 self.tr("Unknown error!"),
+                                 str(ex))
+            return
+
+        self._file = QFileInfo(path)
         self.statusBar().showMessage(self.tr("Load file: ") + path, 5000)
-        self.setWindowTitle(self.tr("Schedule Editor [{}]").format(self.file.absoluteFilePath()))
+        self.setWindowTitle(self.tr("Schedule Editor [{}]").format(self._file.absoluteFilePath()))
         self.update_table_widget()
 
     def action_save_clicked(self) -> None:
-        """ Slot to handle file saving. """
-        if self.file is None:
+        """
+        Slot to handle file saving.
+        """
+        if self._file is None:
             self.action_save_as_clicked()
         else:
-            self.schedule.save(self.file.absoluteFilePath())
-            self.setWindowTitle(self.tr("Schedule Editor [{}]").format(self.file.absoluteFilePath()))
-            self.statusBar().showMessage(self.tr("Save file: ") + self.file.absoluteFilePath(), 5000)
+            self._schedule.save(self._file.absoluteFilePath())
+            self.setWindowTitle(self.tr("Schedule Editor [{}]").format(self._file.absoluteFilePath()))
+            self.statusBar().showMessage(self.tr("Save file: ") + self._file.absoluteFilePath(), 5000)
 
     def action_save_as_clicked(self) -> None:
-        """ Slot to save the file if it has not been saved before """
+        """
+        Slot to save the file if it has not been saved before.
+        """
         path = QFileDialog.getSaveFileName(self,
                                            self.tr("Save schedule as XML file"),
                                            "./examples",
@@ -263,22 +402,29 @@ class ScheduleEditorWindow(QMainWindow):
         if not path.endswith(".xml"):
             path += ".xml"
 
-        self.schedule.save(path)
-        self.file = QFileInfo(path)
-        self.setWindowTitle(self.tr("Schedule Editor [{}]").format(self.file.absoluteFilePath()))
-        self.statusBar().showMessage(self.tr("Save file: ") + self.file.absoluteFilePath(), 5000)
+        self._schedule.save(path)
+        self._file = QFileInfo(path)
+        self.setWindowTitle(self.tr("Schedule Editor [{}]").format(self._file.absoluteFilePath()))
+        self.statusBar().showMessage(self.tr("Save file: ") + self._file.absoluteFilePath(), 5000)
 
     def action_export_clicked(self) -> None:
-        """ Slot for schedule export to PDF """
-        exporter = ExportWindow(self.schedule, self)
+        """
+        Slot for schedule export to PDF.
+         """
+        exporter = ExportWindow(self._schedule, self)
         exporter.exec_()
 
     def action_settings_clicked(self) -> None:
+        """
+        Slot for calling up the settings window.
+        """
         settings = SettingsWindow(self)
         settings.exec_()
 
     def action_about_clicked(self) -> None:
-        """ Slot display window: "About program" """
+        """
+        Slot display window: "About program".
+        """
         QMessageBox.information(self,
                                 self.tr("About program"),
                                 self.tr("""
@@ -297,9 +443,22 @@ class ScheduleEditorWindow(QMainWindow):
                                 """))
 
     def cell_clicked(self) -> None:
-        """ Processes the action to change a table cell """
-        index = self.table_widget.currentIndex()
-        selector = PairSelectorWindow(self.schedule, index, self)
+        """
+        Processes the action to change a table cell.
+        """
+        day = self.table_widget.currentRow()
+        number = self.table_widget.currentColumn()
+
+        item = self.table_widget.currentItem()
+        if item is not None:
+            duration = item.data(Qt.UserRole)
+        else:
+            duration = self.table_widget.columnSpan(day, number)
+
+        day, number, duration = self._schedule.normalize_index(day, number, duration)
+
+        selector = PairSelectorWindow(self._schedule, day, number, duration, self)
         selector.pairsListChanged.connect(self.update_table_widget)
         selector.exec_()
+
         self.update_table_widget()

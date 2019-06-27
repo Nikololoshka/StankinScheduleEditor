@@ -8,14 +8,18 @@ from project.pair_creator_window import PairCreatorWindow
 
 
 class PairSelectorWindow(QDialog):
-
+    """
+    Class describing a dialog box to select the pair.
+    """
     pairsListChanged = pyqtSignal()
 
-    def __init__(self, scheduler_ref: Schedule, index: QModelIndex, parent: QWidget = None):
+    def __init__(self, scheduler_ref: Schedule, day, number, duration, parent: QWidget = None):
         super().__init__(parent)
 
-        self.scheduler_ref = scheduler_ref
-        self.index = index
+        self._scheduler_ref = scheduler_ref
+        self._day = day
+        self._number = number
+        self._duration = duration
 
         # window settings
         self.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
@@ -48,6 +52,7 @@ class PairSelectorWindow(QDialog):
         self.layout_horizontal.addLayout(self.layout_navigate)
 
         self.setLayout(self.layout_horizontal)
+        self.setLayout(self.layout_horizontal)
 
         self.update_pairs_list()
 
@@ -58,9 +63,12 @@ class PairSelectorWindow(QDialog):
         self.push_button_remove.clicked.connect(self.push_button_remove_clicked)
         self.push_button_cancel.clicked.connect(self.close)
 
-    def update_pairs_list(self):
+    def update_pairs_list(self) -> None:
+        """
+        Updates the list of pairs in the window.
+        """
         self.list_widget.clear()
-        pairs = self.scheduler_ref.pairs_by_index(self.index.row(), self.index.column())
+        pairs = self._scheduler_ref.pairs_by_index(self._day, self._number, self._duration)
         for pair in pairs:
             item = QListWidgetItem(str(pair))
             item.setData(Qt.UserRole, pair)
@@ -68,18 +76,27 @@ class PairSelectorWindow(QDialog):
 
         self.pairsListChanged.emit()
 
-    def remove_pair(self, item):
-        remove_pair = item.data(Qt.UserRole)
-        self.scheduler_ref.remove_pair(self.index.row(), self.index.column(), remove_pair)
+    def remove_pair(self, item, back_mode: bool = False) -> None:
+        """
+        Removes a pair from the schedule.
 
-    def push_button_new_clicked(self):
-        creator = PairCreatorWindow(self.index, self)
+        :param item: Selected object with pair
+        :param back_mode: True - if the pair is deleted for editing
+        """
+        remove_pair = item.data(Qt.UserRole)
+        self._scheduler_ref.remove_pair(remove_pair, back_mode)
+
+    def push_button_new_clicked(self) -> None:
+        """
+        Slot to create a new pair.
+        """
+        creator = PairCreatorWindow(self._number, self)
         while True:
             creator.exec_()
             new_pair = creator.get_pair()
             if new_pair is not None:
                 try:
-                    self.scheduler_ref.add_pair(new_pair)
+                    self._scheduler_ref.add_pair(new_pair)
                     self.update_pairs_list()
                     break
                 except Exception as ex:
@@ -87,16 +104,19 @@ class PairSelectorWindow(QDialog):
             else:
                 break
 
-    def push_button_edit_clicked(self):
+    def push_button_edit_clicked(self) -> None:
+        """
+        Slot to edit the pair.
+        """
         item = self.list_widget.currentItem()
         if item is None:
             QMessageBox.information(self, self.tr("Information"), self.tr("No pair selected"))
             return
 
         origin_pair = item.data(Qt.UserRole)
-        self.remove_pair(item)
+        self.remove_pair(item, True)
 
-        creator = PairCreatorWindow(self.index, self)
+        creator = PairCreatorWindow(self._number, self)
         creator.set_pair(origin_pair.copy())
 
         while True:
@@ -104,16 +124,19 @@ class PairSelectorWindow(QDialog):
             edit_pair = creator.get_pair()
             if edit_pair is not None:
                 try:
-                    self.scheduler_ref.add_pair(edit_pair)
+                    self._scheduler_ref.add_pair(edit_pair)
                     self.update_pairs_list()
                     break
                 except Exception as ex:
                     QMessageBox.critical(self, self.tr("Invalid pair"), str(ex))
             else:
-                self.scheduler_ref.add_pair(origin_pair, True)
+                self._scheduler_ref.add_pair(origin_pair, True)
                 break
 
-    def push_button_remove_clicked(self):
+    def push_button_remove_clicked(self) -> None:
+        """
+        Slot to remove the pair.
+        """
         item = self.list_widget.currentItem()
         if item is None:
             QMessageBox.information(self, self.tr("Information"), self.tr("No pair selected"))

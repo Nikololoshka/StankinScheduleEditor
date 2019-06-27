@@ -8,7 +8,9 @@ from project.pair.attrib_pair import AttribPair
 
 
 class TypePairAttrib(Enum):
-    """ Enum describing the possible types of a student pair """
+    """
+    Enum describing the possible types of a student pair.
+    """
     Missing = 0
     Lecture = 1
     Seminar = 2
@@ -16,12 +18,16 @@ class TypePairAttrib(Enum):
 
     @staticmethod
     def value_of(s: str):
-        """ Returns a type by its string representation """
+        """
+        Returns a type by its string representation.
+        """
         return TypePairAttrib.__members__[s.title()]
 
     @staticmethod
     def items():
-        """ Returns a tuple of tuples of the form: (type name, type) """
+        """
+        Returns a tuple of tuples of the form: (type name, type).
+        """
         return (str(TypePairAttrib.Missing), TypePairAttrib.Missing), \
                (str(TypePairAttrib.Lecture), TypePairAttrib.Lecture), \
                (str(TypePairAttrib.Seminar), TypePairAttrib.Seminar), \
@@ -33,9 +39,13 @@ class TypePairAttrib(Enum):
 
 
 class TypePairAttribTranslator(QObject):
-    """ A helper class to translate the enumeration of a pair type value """
+    """
+    A helper class to translate the enumeration of a pair type value.
+    """
     def translate(self, type: TypePairAttrib) -> str:
-        """ Returns the translation of a pair type value """
+        """
+        Returns the translation of a pair type value.
+        """
         return {
             TypePairAttrib.Missing: "---",
             TypePairAttrib.Lecture: self.tr("Lecture"),
@@ -45,7 +55,9 @@ class TypePairAttribTranslator(QObject):
 
 
 class TypePair(AttribPair):
-    """  Class describing the type of a student pair """
+    """
+    Class describing the type of a student pair.
+    """
     def __init__(self, t: TypePairAttrib = TypePairAttrib.Missing):
         super().__init__()
         self._type: TypePairAttrib = t
@@ -57,7 +69,11 @@ class TypePair(AttribPair):
         return t
 
     def set_type(self, t: TypePairAttrib):
-        """ Sets the value of type """
+        """
+        Sets the value of type.
+
+        :param t: Type
+        """
         self._type = t
 
     def load(self, el: Xml.Element) -> None:

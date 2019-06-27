@@ -6,7 +6,9 @@ from project.pair.attrib_pair import AttribPair
 
 
 class TitlePair(AttribPair):
-    """ Class describing the title pair """
+    """
+    Class describing the title pair.
+    """
     def __init__(self, s: str = ""):
         super().__init__()
         self._title: str = s
@@ -18,7 +20,11 @@ class TitlePair(AttribPair):
         return title
 
     def set_title(self, s: str):
-        """ Sets the value of title """
+        """
+        Sets the value of title.
+
+        :param s: Title
+        """
         self._title = s
 
     def load(self, el: Xml.Element) -> None:

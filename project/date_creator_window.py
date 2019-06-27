@@ -9,7 +9,9 @@ from project.pair import DateItem, DateRange, FrequencyDate, InvalidDatePair
 
 
 class DateCreatorWindow(QDialog):
-    """ Dialog window for creation / editing date """
+    """
+    Dialog window for creation / editing date.
+    """
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
 
@@ -106,13 +108,18 @@ class DateCreatorWindow(QDialog):
         self.show_simple_date()
 
     def set_date(self, date_item) -> None:
-        """ Sets the date for editing """
+        """
+        Sets the date for editing.
+
+        :param date_item: Set date
+        """
         if isinstance(date_item, DateItem):
             self.show_simple_date()
             self.date_edit_simple.setDate(QDate.fromString(date_item.date, "yyyy.MM.dd"))
             self._date = date_item
 
         if isinstance(date_item, DateRange):
+            self.check_box.setChecked(True)
             self.show_range_date()
             self.date_edit_start.setDate(QDate.fromString(date_item.date_from, "yyyy.MM.dd"))
             self.date_edit_end.setDate(QDate.fromString(date_item.date_to, "yyyy.MM.dd"))
@@ -120,11 +127,15 @@ class DateCreatorWindow(QDialog):
             self._date = date_item
 
     def get_date(self) -> (DateItem, DateRange, None):
-        """ Returns the created date """
+        """
+        Returns the created date.
+        """
         return self._date
 
     def show_simple_date(self) -> None:
-        """ Switches the window to simple date editing mode """
+        """
+        Switches the window to simple date editing mode.
+        """
         self.label_simple_date.setVisible(True)
         self.date_edit_simple.setVisible(True)
 
@@ -136,7 +147,9 @@ class DateCreatorWindow(QDialog):
         self.combo_box_frequency.setVisible(False)
 
     def show_range_date(self) -> None:
-        """ Switches the window to range date editing mode """
+        """
+        Switches the window to range date editing mode.
+        """
         self.label_date_start.setVisible(True)
         self.date_edit_start.setVisible(True)
         self.label_date_end.setVisible(True)
@@ -148,7 +161,11 @@ class DateCreatorWindow(QDialog):
         self.date_edit_simple.setVisible(False)
 
     def date_edit_start_change(self, date: QDate) -> None:
-        """ Slot for start date edit """
+        """
+        Slot for changing the end of a range of dates.
+
+        :param date: Start of the date range
+        """
         end_date = self.date_edit_end.date().addDays(self._date_start_temp.daysTo(date))
         self.date_edit_end.setDateRange(date.addDays(self._date_delta),
                                         date.addDays(365))
@@ -156,7 +173,11 @@ class DateCreatorWindow(QDialog):
         self._date_start_temp = QDate(date)
 
     def combo_box_frequency_changed(self, index: int) -> None:
-        """ Slot for frequency combo box """
+        """
+        Slot for frequency combo box.
+
+        :param index: Current index
+        """
         if index == 0:
             self._date_delta = 7
         else:
@@ -167,7 +188,9 @@ class DateCreatorWindow(QDialog):
         self.date_range_validation()
 
     def date_range_validation(self) -> None:
-        """ Checks the correctness of the entered dates """
+        """
+        Checks the correctness of the entered dates.
+        """
         if self.date_edit_start.date().dayOfWeek() == self.date_edit_end.date().dayOfWeek():
             if self.date_edit_start.date().daysTo(self.date_edit_end.date()) % self._date_delta == 0:
                 msg = ""
@@ -188,7 +211,11 @@ class DateCreatorWindow(QDialog):
         self.date_edit_end.setToolTip(msg)
 
     def check_box_clicked(self, value: bool) -> None:
-        """ Slot for check box """
+        """
+        Slot for check box.
+
+        :param value: Check box status
+        """
         if value is False:
             # simple date
             self.show_simple_date()
@@ -197,12 +224,16 @@ class DateCreatorWindow(QDialog):
             self.show_range_date()
 
     def push_button_ok_clicked(self) -> None:
-        """ Slot for ok button """
+        """
+        Slot for ok button.
+        """
         if self.push_button_apply_clicked():
             self.close()
 
     def push_button_apply_clicked(self) -> bool:
-        """ Slot for apply button """
+        """
+        Slot for apply button.
+        """
         try:
             if self.check_box.isChecked() is False:
                 # simple date
@@ -221,6 +252,9 @@ class DateCreatorWindow(QDialog):
 
         return False
 
-    def push_button_cancel_clicked(self):
+    def push_button_cancel_clicked(self) -> None:
+        """
+        Slot for cancel button.
+        """
         self._date = None
         self.close()

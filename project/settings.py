@@ -5,10 +5,14 @@ from PyQt5.QtWidgets import QWidget, QDialog, QGroupBox, QComboBox, QFormLayout,
                             QLabel, QVBoxLayout, QHBoxLayout, QPushButton
 from PyQt5.QtCore import Qt, QSettings, QTranslator, QEvent
 
+# importing resources
 from res import resources
 
 
 class SettingsWindow(QDialog):
+    """
+    Class describing the application settings window.
+    """
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
 
@@ -85,7 +89,10 @@ class SettingsWindow(QDialog):
         else:
             super().changeEvent(event)
 
-    def application_lang_changed(self):
+    def application_lang_changed(self) -> None:
+        """
+        Method to change the application language.
+        """
         Settings.ApplicationLang = self.combo_box_app_lang.currentData()
 
         translator = QTranslator()
@@ -96,7 +103,10 @@ class SettingsWindow(QDialog):
         qApp.installTranslator(translator)
         Settings.ApplicationTranslator = translator
 
-    def schedule_lang_changed(self):
+    def schedule_lang_changed(self) -> None:
+        """
+        Method to change the language of the schedule.
+        """
         Settings.ScheduleLang = self.combo_box_sch_lang.currentData()
 
         translator = QTranslator()
@@ -109,6 +119,9 @@ class SettingsWindow(QDialog):
 
 
 class Settings:
+    """
+    Class describing the application settings.
+    """
     ApplicationLang = "en_US"
     ScheduleLang = "en_US"
 
@@ -123,6 +136,9 @@ class Settings:
 
     @staticmethod
     def load() -> None:
+        """
+        Loading settings.
+        """
         settings = QSettings("settings.ini", QSettings.IniFormat)
         settings.beginGroup("Application")
         Settings.ApplicationLang = settings.value("application-lang", "en_US")
@@ -131,6 +147,9 @@ class Settings:
 
     @staticmethod
     def save() -> None:
+        """
+        Saving settings.
+        """
         settings = QSettings("settings.ini", QSettings.IniFormat)
         settings.beginGroup("Application")
         settings.setValue("application-lang", Settings.ApplicationLang)

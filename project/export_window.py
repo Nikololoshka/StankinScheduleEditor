@@ -2,27 +2,30 @@
 
 # imports
 from PyQt5.QtWidgets import QDialog, QWidget, QFormLayout, QLineEdit, QLabel, QCheckBox, \
-                            QGroupBox, QDateEdit, QHBoxLayout, QVBoxLayout, QPushButton, \
-                            QSizePolicy, QMessageBox, QComboBox, QProgressDialog, \
-                            QFileDialog, QColorDialog, qApp
+    QGroupBox, QDateEdit, QHBoxLayout, QVBoxLayout, QPushButton, \
+    QSizePolicy, QMessageBox, QComboBox, QProgressDialog, \
+    QFileDialog, QColorDialog, qApp
 from PyQt5.QtCore import Qt, QStandardPaths, QDate, QFileInfo, QUrl
 from PyQt5.QtGui import QColor, QPixmap, QIcon, QDesktopServices
-from fpdf import FPDF   # PyFPDF2
+from fpdf import FPDF  # PyFPDF2
 from fpdf.ttfonts import TTFontFile
 
 from project.schedule import Schedule
 from datetime import timedelta
-from project.pair import DaysOfWeek, StudentPairAttrib, SubgroupPairAttrib, DateItem
-from project import defaults
+from project.pair import DaysOfWeek, SubgroupPairAttrib, TimePair
 
 import os
 import re
+import math
 import platform
 
 FPDF.FPDF_CACHE_MODE = 1  # no cache
 
 
 class ExportWindow(QDialog):
+    """
+    Class describing a dialog for export of schedules.
+    """
     def __init__(self, schedule: Schedule, parent: QWidget = None):
         super().__init__(parent)
         self._schedule_ref = schedule
@@ -135,7 +138,7 @@ class ExportWindow(QDialog):
         self.combo_box_color_a.setCurrentIndex(9)   # lime
         self.combo_box_color_b.setCurrentIndex(15)  # yellow
 
-        self.combo_box_pattern_a_b.addItem("None")
+        self.combo_box_pattern_a_b.addItem(self.tr("Chess order"))
         self.combo_box_pattern_a_b.setEnabled(False)
 
         # navigate buttons
@@ -175,6 +178,11 @@ class ExportWindow(QDialog):
         self.push_button_cancel.clicked.connect(self.close)
 
     def add_standard_colors(self, combo_box: QComboBox) -> None:
+        """
+        Adds colors to the color selection menu.
+
+        :param combo_box: Color selection menu
+        """
         color_items = [
             (self.tr("Custom color"), QColor()),
             (self.tr("Aqua"), QColor(0, 255, 255)),
@@ -198,10 +206,10 @@ class ExportWindow(QDialog):
             combo_box.addItem(self.create_color_icon(data), name, data)
 
     def export_to_pdf(self) -> None:
-
-        if not self.encoding_test():
-            return
-
+        """
+        Method for export to PDF file
+        """
+        # select path
         if self._file is None:
             path = QFileDialog.getSaveFileName(self,
                                                self.tr("Export to pdf"),
@@ -215,182 +223,256 @@ class ExportWindow(QDialog):
 
             self._file = QFileInfo(path)
 
-        weeks = self.date_edit_start.date().daysTo(self.date_edit_end.date()) / 7
-        count = 0
-
-        progress = QProgressDialog(self.tr("Export to pdf"),
-                                   self.tr("Abort export"), 0, weeks, self)
-        progress.setWindowModality(Qt.WindowModal)
-        progress.setMinimumDuration(1000)
-
-        pdf = FPDF(orientation="L")
-
-        font_name = self.combo_box_font.currentText()
-        font_path = self.combo_box_font.currentData()
-        start = self.date_edit_start.date().toPyDate()
-        end = self.date_edit_end.date().toPyDate()
-        delta = timedelta(days=1)
-
-        encoding = self.combo_box_encoding.currentText()
-        if encoding == "UTF-8":
-            pdf.add_font(font_name, "", font_path, uni=True)
-        else:
-            pdf.add_font(font_name, "", font_path)
-            pdf.set_doc_option("core_fonts_encoding", encoding)
-
-        pdf.set_font(font_name)
-
-        while True:
-            pdf.add_page()
-            data = [[{"text": "", "subgroup": None} for j in range(8)] for i in range(6)]
-
-            for i in range(6):
-                now = DateItem(start.strftime("%Y.%m.%d"))
-                for j in range(8):
-                    pairs = self._schedule_ref.pairs_by_index(i, j)
-                    for pair in pairs:
-                        if now in pair.get_value(StudentPairAttrib.Date):
-                            data[i][j]["text"] += str(pair) + "\n"
-                            data[i][j]["subgroup"] = pair.get_value(StudentPairAttrib.Subgroup)
-
-                start += delta
-
-            x, y = float(pdf.get_x()), float(pdf.get_y())
-
-            pdf.set_auto_page_break(True, margin=y)
-
-            w = float(pdf.w) - 2 * float(pdf.get_x())
-            h = float(pdf.h) - 2 * float(pdf.get_y()) - 6
-
-            title = 10
-
-            title_text = self.line_edit_title.text()
-            if self.check_box_add_date.isChecked():
-                title_text += " {}-{}".format((start + timedelta(days=-6)).strftime("%d.%m.%Y"),
-                                              start.strftime("%d.%m.%Y"))
-
-            pdf.set_font_size(14)
-            pdf.cell(w, title, txt=title_text, align="C", border=0)
-            h -= title
-
-            first_column, first_row = 4, 4
-
-            step_column = (w - first_row) / 8
-            step_row = (h - first_column) / 6
-
-            for i in range(7):
-                for j in range(9):
-                    if i == 0 and j == 0:
-                        pdf.set_xy(x, y + title)
-                        pdf.cell(first_column, first_row, border=1)
-                    elif i == 0:
-                        pdf.set_xy(x + first_row + step_column * (j - 1), y + title)
-                        pdf.set_font_size(8)
-                        pdf.cell(step_column, first_row, txt=defaults.get_time_start_end(j - 1), align="C", border=1)
-                    elif j == 0:
-                        pdf.set_xy(x, y + title + first_column + step_row * (i - 1) + step_row)
-                        pdf.rotate(90)
-                        pdf.set_font_size(8)
-                        pdf.cell(step_row, first_row, txt=str(DaysOfWeek.value_of(i - 1)), align="C", border=1)
-                        pdf.rotate(0)
-                    else:
-                        pdf.set_xy(x + first_row + step_column * (j - 1),
-                                   y + title + first_column + step_row * (i - 1))
-
-                        if data[i - 1][j - 1]["subgroup"] is not None:
-                            if data[i - 1][j - 1]["subgroup"].get_subgroup() == SubgroupPairAttrib.A:
-                                color: QColor = self.combo_box_color_a.currentData()
-                                pdf.set_fill_color(color.red(), color.green(), color.blue())
-                                pdf.cell(step_column, step_row, border=1, fill=1)
-                            elif data[i - 1][j - 1]["subgroup"].get_subgroup() == SubgroupPairAttrib.B:
-                                color: QColor = self.combo_box_color_b.currentData()
-                                pdf.set_fill_color(color.red(), color.green(), color.blue())
-                                pdf.cell(step_column, step_row, border=1, fill=1)
-                            else:
-                                pdf.cell(step_column, step_row, border=1)
-                        else:
-                            pdf.cell(step_column, step_row, border=1)
-
-                        if data[i - 1][j - 1]["subgroup"] is not None:
-                            size = 7
-                            offset = 1
-                            while size >= 1:
-                                pdf.set_font_size(size)
-                                lst = pdf.multi_cell(step_column, step_row,
-                                                     txt=data[i - 1][j - 1]["text"], align="L", split_only=True)
-                                hf = size / 2.8
-                                if len(lst) * hf <= step_row - offset * 2:
-                                    for k, t in enumerate(lst):
-                                        pdf.set_xy(x + first_row + step_column * (j - 1),
-                                                   y + title + first_column + step_row * (i - 1) + k * hf + offset)
-
-                                        pdf.cell(step_column, hf, txt=t, align="L")
-                                    break
-                                size -= 1
-
-            count += 1
-            progress.setValue(count)
-            if progress.wasCanceled():
-                break
-
-            start += delta
-            if end <= start:
-                break
-
-        pdf.output(self._file.absoluteFilePath())
-        progress.setValue(weeks)
-
-        finish_msg_box = QMessageBox(QMessageBox.Information,  self.tr("Export to pdf"),
-                                     self.tr("Gone!"))
-        open_folder_button = finish_msg_box.addButton(self.tr("Open folder"),
-                                                      QMessageBox.ActionRole)
-        finish_msg_box.addButton(QMessageBox.Ok)
-        finish_msg_box.exec_()
-
-        if finish_msg_box.clickedButton() == open_folder_button:
-            QDesktopServices.openUrl(QUrl(self._file.absolutePath()))
-
-    def encoding_test(self) -> bool:
-        font_name = self.combo_box_font.currentText()
-        font_path = self.combo_box_font.currentData()
-
-        done = False
-
         try:
-            test_pdf = FPDF(orientation="L")
-            test_pdf.add_page()
+            # progress dialog
+            weeks = self.date_edit_start.date().daysTo(self.date_edit_end.date()) / 7
+            count = 0
 
+            progress = QProgressDialog(self.tr("Export to pdf"),
+                                       self.tr("Abort export"), 0, weeks, self)
+            progress.setWindowModality(Qt.WindowModal)
+            progress.setMinimumDuration(1000)
+
+            # pdf
+            pdf = FPDF(orientation="L")
+
+            font_name = self.combo_box_font.currentText()
+            font_path = self.combo_box_font.currentData()
+            start = self.date_edit_start.date().toPyDate()
+            end = self.date_edit_end.date().toPyDate()
+
+            # encoding
             encoding = self.combo_box_encoding.currentText()
             if encoding == "UTF-8":
-                test_pdf.add_font(font_name, "", font_path, uni=True)
+                pdf.add_font(font_name, "", font_path, uni=True)
             else:
-                test_pdf.add_font(font_name, "", font_path)
-                test_pdf.set_doc_option("core_fonts_encoding", encoding)
+                pdf.add_font(font_name, "", font_path)
+                pdf.set_doc_option("core_fonts_encoding", encoding)
 
-            test_pdf.set_font(font_name)
-            test_pdf.cell(100, 100, self.line_edit_title.text())
+            pdf.set_font(font_name)
 
-            done = True
+            while True:
+                pdf.add_page()
+
+                schedule = self._schedule_ref.create_week_schedule(start, start + timedelta(days=6))
+                if schedule.rows() != 6:
+                    raise Exception("Combining cells when exporting to pdf "
+                                    "is not supported. Sorry for the inconvenience.")
+
+                start += timedelta(days=6)
+
+                x, y = float(pdf.get_x()), float(pdf.get_y())
+                w = float(pdf.w) - 2 * float(pdf.get_x())
+                h = float(pdf.h) - 2 * float(pdf.get_y()) - 6
+
+                pdf.set_auto_page_break(True, margin=y)
+
+                title = 10
+                title_text = self.line_edit_title.text()
+                if self.check_box_add_date.isChecked():
+                    title_text += " {} - {}".format((start + timedelta(days=-6)).strftime("%d.%m.%Y"),
+                                                    start.strftime("%d.%m.%Y"))
+
+                pdf.set_font_size(14)
+                pdf.cell(w, title, txt=title_text, align="C", border=0)
+                h -= title
+
+                first_column, first_row = 4, 4
+
+                step_column = (w - first_row) / 8
+                step_row = (h - first_column) / 6
+
+                i = 0
+                while i < 7:
+                    j = 0
+                    while j < 9:
+                        if i == 0 and j == 0:
+                            # upper-left cell
+                            pdf.set_xy(x, y + title)
+                            pdf.cell(first_column,
+                                     first_row,
+                                     border=1)
+                            j += 1
+                        elif i == 0:
+                            # top cells with time
+                            pdf.set_xy(x + first_row + step_column * (j - 1), y + title)
+                            pdf.set_font_size(8)
+                            pdf.cell(step_column,
+                                     first_row,
+                                     txt=TimePair.time_start_end(j - 1),
+                                     align="C",
+                                     border=1)
+                            j += 1
+                        elif j == 0:
+                            # left cells with days of the week
+                            pdf.set_xy(x, y + title + first_column + step_row * (i - 1) + step_row)
+                            pdf.rotate(90)
+                            pdf.set_font_size(8)
+                            pdf.cell(step_row,
+                                     first_row,
+                                     txt=str(DaysOfWeek.value_of(i - 1)),
+                                     align="C",
+                                     border=1)
+                            pdf.rotate(0)
+                            j += 1
+                        else:
+                            # cells inside the table
+                            pdf.set_xy(x + first_row + step_column * (j - 1),
+                                       y + title + first_column + step_row * (i - 1))
+
+                            pairs = schedule.pairs_by_index(i - 1, j - 1, 1) \
+                                + schedule.pairs_by_index(i - 1, j - 1, 2)
+
+                            max_duration = max([1, *[pair["time"].duration() for pair in pairs]])
+
+                            # select color for cell
+                            if all(pair["subgroup"].get_subgroup() == SubgroupPairAttrib.Common
+                                   for pair in pairs):
+                                # common
+                                pdf.cell(step_column * max_duration,
+                                         step_row,
+                                         border=1)
+                            elif all(pair["subgroup"].get_subgroup() == SubgroupPairAttrib.A
+                                     for pair in pairs):
+                                # A subgroup
+                                color: QColor = self.combo_box_color_a.currentData()
+                                pdf.set_fill_color(color.red(), color.green(), color.blue())
+                                pdf.cell(step_column * max_duration,
+                                         step_row,
+                                         border=1,
+                                         fill=1)
+                            elif all(pair["subgroup"].get_subgroup() == SubgroupPairAttrib.B
+                                     for pair in pairs):
+                                # B subgroup
+                                color: QColor = self.combo_box_color_b.currentData()
+                                pdf.set_fill_color(color.red(), color.green(), color.blue())
+                                pdf.cell(step_column * max_duration,
+                                         step_row,
+                                         border=1,
+                                         fill=1)
+                            else:
+                                # A and B subgroup
+                                prev_x = pdf.get_x()
+                                prev_y = pdf.get_y()
+
+                                toggle = True
+
+                                row = 5
+                                column = math.ceil(step_column * max_duration / step_row * row)
+
+                                for m in range(column):
+                                    for n in range(row):
+                                        pdf.set_xy(prev_x + m * step_column * max_duration / column,
+                                                   prev_y + n * step_row / row)
+
+                                        if toggle:
+                                            color: QColor = self.combo_box_color_a.currentData()
+                                            toggle = False
+                                        else:
+                                            color: QColor = self.combo_box_color_b.currentData()
+                                            toggle = True
+
+                                        pdf.set_fill_color(color.red(), color.green(), color.blue())
+                                        pdf.cell(step_column * max_duration / column,
+                                                 step_row / row,
+                                                 border=0,
+                                                 fill=1)
+                                pdf.set_xy(prev_x, prev_y)
+
+                            text = ""
+                            for pair in pairs:
+                                text += str(pair) + "\n"
+
+                            if text != "":
+                                # calculates the font size and draws the text
+                                size = 7
+                                offset = 1
+                                while size >= 1:
+                                    pdf.set_font_size(size)
+                                    # a list with the cells needed to be displayed
+                                    lst = pdf.multi_cell(step_column * max_duration,
+                                                         step_row,
+                                                         txt=text,
+                                                         align="L",
+                                                         split_only=True)
+                                    hf = size / 2.8
+                                    if len(lst) * hf <= step_row - offset * 2:
+                                        for k, t in enumerate(lst):
+                                            pdf.set_xy(x + first_row + step_column * (j - 1),
+                                                       y + title + first_column + step_row
+                                                       * (i - 1) + k * hf + offset)
+                                            pdf.cell(step_column * max_duration,
+                                                     hf,
+                                                     txt=t,
+                                                     align="L")
+                                        break
+                                    size -= 1
+                            j += max_duration
+                    i += 1
+
+                count += 1
+                progress.setValue(count)
+                if progress.wasCanceled():
+                    break
+
+                start += timedelta(days=1)
+                if end <= start:
+                    break
+
+            pdf.output(self._file.absoluteFilePath())
+            progress.setValue(weeks)
+
+            # finish dialog
+            finish_msg_box = QMessageBox(QMessageBox.Information, self.tr("Export to pdf"),
+                                         self.tr("Gone!"))
+            open_folder_button = finish_msg_box.addButton(self.tr("Open folder"),
+                                                          QMessageBox.ActionRole)
+            finish_msg_box.addButton(QMessageBox.Ok)
+            finish_msg_box.exec_()
+
+            if finish_msg_box.clickedButton() == open_folder_button:
+                QDesktopServices.openUrl(QUrl(self._file.absolutePath()))
+
+        except UnicodeEncodeError as ex:
+            QMessageBox.critical(self,
+                                 self.tr("Encoding error"),
+                                 str(ex))
         except Exception as ex:
-            QMessageBox.critical(self, self.tr("Encoding error!"), str(ex))
-
-        return done
+            QMessageBox.critical(self,
+                                 self.tr("Unknown error"),
+                                 str(ex))
 
     def combo_box_color_a_clicked(self) -> None:
+        """
+        Slot for color selection of A subgroup.
+        """
         if self.combo_box_color_a.currentIndex() == 0:
             self.custom_color_selected(self.combo_box_color_a)
 
     def combo_box_color_b_clicked(self) -> None:
+        """
+        Slot for color selection of B subgroup.
+        """
         if self.combo_box_color_b.currentIndex() == 0:
             self.custom_color_selected(self.combo_box_color_b)
 
     def custom_color_selected(self, combo_box: QComboBox) -> None:
+        """
+        Slot to select the color for the desired menu.
+
+        :param combo_box: Menu
+        """
         color = QColorDialog.getColor(combo_box.currentData(), self)
         if color.isValid():
             combo_box.setItemIcon(0, self.create_color_icon(color))
             combo_box.setItemData(0, color)
 
     def date_edit_start_changed(self, date: QDate):
+        """
+        Slot for changing the end of a range of dates.
+
+        :param date: Start of the date range
+        """
         end_date = self.date_edit_end.date().addDays(self._date_start_cache.daysTo(date))
         self.date_edit_end.setMinimumDate(date.addDays(7))
         self.date_edit_end.setDate(end_date)
@@ -398,12 +480,21 @@ class ExportWindow(QDialog):
 
     @staticmethod
     def create_color_icon(color: QColor) -> QIcon:
+        """
+        Creates an icon with the specified color.
+
+        :param color: Icon color
+        :return: QIcon object
+        """
         pix_map = QPixmap(32, 32)
         pix_map.fill(color)
         icon = QIcon(pix_map)
         return icon
 
     def get_fonts(self) -> list:
+        """
+        Returns a list of tuples (font, path) of all fonts installed on the system.
+        """
         paths = []
 
         for path in QStandardPaths.standardLocations(QStandardPaths.FontsLocation):

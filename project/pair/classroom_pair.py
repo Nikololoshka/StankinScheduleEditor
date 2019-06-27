@@ -6,7 +6,9 @@ from project.pair.attrib_pair import AttribPair
 
 
 class ClassroomPair(AttribPair):
-    """ Class describing the classroom pair """
+    """
+    Class describing the classroom pair.
+    """
     def __init__(self, s: str = ""):
         super().__init__()
         self._classroom: str = s
@@ -18,7 +20,11 @@ class ClassroomPair(AttribPair):
         return classroom
 
     def set_classroom(self, s: str) -> None:
-        """ Sets the value of classroom """
+        """
+        Sets the value of classroom.
+
+        :param s: Classroom
+        """
         self._classroom = s
 
     def load(self, el: Xml.Element) -> None:

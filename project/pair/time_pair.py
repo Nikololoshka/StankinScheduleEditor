@@ -3,45 +3,58 @@
 # imports
 from xml.etree import ElementTree as Xml
 from project.pair.attrib_pair import AttribPair
-from project import defaults
 
 
 class TimePair(AttribPair):
-    """ Class describing the time of a student pair """
+    """
+    Class describing the time of a student pair.
+    """
     def __init__(self):
         super().__init__()
         self._start: str = ""
+        self._start_number = 0
         self._end: str = ""
-        self._count: int = 0
+        self._end_number = 0
+        self._duration: int = 0
 
-    def set_time(self, start: str, end: str, count: int = None):
-        """ Sets the start time, end time, and number of pairs in this time period """
-        self._start = start
-        self._end = end
-        self.set_count(count)
+    def set_time(self, start: str, end: str, duration: int = None):
+        """
+        Sets the start time, end time, and number of pairs in this time period.
+        """
+        self.set_start(start)
+        self.set_end(end)
+        self.set_count(duration)
 
     def set_start(self, start):
-        """ Sets the start time """
+        """
+        Sets the start time.
+        """
         self._start = start
+        self._start_number = self.time_starts().index(self._start)
 
     def set_end(self, end):
-        """ Sets the end time """
+        """
+        Sets the end time.
+        """
         self._end = end
+        self._end_number = self.time_ends().index(self._end)
 
-    def set_count(self, count: int = 0):
-        """ Sets the number of pairs in this time period """
-        self._count = count
-        if self._count is None:
-            start = defaults.get_time_start().index(self._start)
-            end = defaults.get_time_end().index(self._end)
-            self._count = start - end + 1
+    def set_count(self, duration: int = 0):
+        """
+        Sets the number of pairs in this time period.
+        """
+        if duration is None:
+            start = self.time_starts().index(self._start)
+            end = self.time_ends().index(self._end)
+            self._duration = end - start + 1
+        else:
+            self._duration = int(duration)
 
     def get_number(self) -> int:
-        """ Returns the number of the pair in order """
-        if self._start == "":
-            return 0
-
-        return defaults.get_time_start().index(self._start)
+        """
+        Returns the number of the pair in order.
+        """
+        return self._start_number
 
     @staticmethod
     def from_xml_pair(file: Xml.Element):
@@ -50,14 +63,12 @@ class TimePair(AttribPair):
         return time
 
     def load(self, el: Xml.Element) -> None:
-        """ Load TimePair from XML file. """
         self.set_time(el.findtext("start"),
                       el.findtext("end"),
-                      el.attrib.get("count"))
+                      el.attrib.get("duration"))
 
     def save(self) -> Xml.Element:
-        """ Save TimePair to XML file """
-        element = Xml.Element("time", {"count": str(self._count)})
+        element = Xml.Element("time")
 
         sub_element = Xml.SubElement(element, "start")
         sub_element.text = self._start
@@ -69,8 +80,51 @@ class TimePair(AttribPair):
 
     def copy(self):
         new_time = TimePair()
-        new_time.set_time(self._start, self._end, self._count)
+        new_time.set_time(self._start, self._end, self._duration)
         return new_time
+
+    def intersect(self, other) -> bool:
+        """
+        True - if times intersect, otherwise False.
+
+        :param other: Other TimePair
+        """
+        if isinstance(other, TimePair):
+            if (self._start_number >= other._start_number) and (self._end_number <= other._end_number) or \
+                    (self._start_number <= other._start_number) and (self._end_number >= other._start_number) or \
+                    (self._start_number <= other._end_number) and (self._end_number >= other._end_number):
+                return True
+            else:
+                return False
+
+    @staticmethod
+    def time_starts() -> tuple:
+        """
+        Returns the tuple of the start time of the pairs.
+        """
+        return "8:30", "10:20", "12:20", "14:10", \
+               "16:00", "18:00", "19:40", "21:20"
+
+    @staticmethod
+    def time_ends() -> tuple:
+        """
+        Returns the time tuple of the end of the pairs.
+        """
+        return "10:10", "12:00", "14:00", "15:50", \
+               "17:40", "19:30", "21:10", "22:50"
+
+    @staticmethod
+    def time_start_end(number) -> str:
+        """
+        Returns the time of the pair in the format: "start - end".
+
+        :param number: Pair number
+        """
+        return "{} - {}".format(TimePair.time_starts()[number],
+                                TimePair.time_ends()[number])
+
+    def duration(self):
+        return self._duration
 
     def is_valid(self) -> bool:
         return self._start != "" and self._end != ""

@@ -4,21 +4,23 @@
 from PyQt5.QtWidgets import QDialog, QWidget, QFormLayout, QLineEdit, QLabel, QCompleter, \
                             QGroupBox, QListWidget, QHBoxLayout, QVBoxLayout, QPushButton, \
                             QMessageBox, QListWidgetItem, QComboBox
-from PyQt5.QtCore import QModelIndex, Qt
-from project.pair import StudentPair, StudentPairAttrib, TypePairAttrib, \
+from PyQt5.QtCore import Qt
+from project.pair import StudentPair, TypePairAttrib, \
                          SubgroupPairAttrib, TimePair, DatePair, InvalidDatePair
 from project.date_creator_window import DateCreatorWindow
 from project import defaults
 
 
 class PairCreatorWindow(QDialog):
-    """ Dialog window for creating a student pair """
-    def __init__(self, index: QModelIndex, parent: QWidget = None):
+    """
+    Dialog window for creating a student pair.
+    """
+    def __init__(self, number, parent: QWidget = None):
         super().__init__(parent)
 
-        self._index: QModelIndex = index
-        self._edit_pair = None
-        self._dates = DatePair()
+        self._number: int = number
+        self._edit_pair: StudentPair = None
+        self._dates: DatePair = DatePair()
 
         # window settings
         self.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
@@ -86,11 +88,10 @@ class PairCreatorWindow(QDialog):
         self.combo_box_end = QComboBox()
         self.layout_time.setWidget(1, QFormLayout.FieldRole, self.combo_box_end)
 
-        self.combo_box_start.addItems(defaults.get_time_start())
-        self.combo_box_start.setCurrentIndex(self._index.column())
-        self.combo_box_end.addItems(defaults.get_time_end())
-        self.combo_box_end.setCurrentIndex(self._index.column())
-        self.combo_box_end.setEnabled(False)
+        self.combo_box_start.addItems(TimePair.time_starts())
+        self.combo_box_start.setCurrentIndex(self._number)
+        self.combo_box_end.addItems(TimePair.time_ends())
+        self.combo_box_end.setCurrentIndex(self._number)
 
         # date setting
         self.group_box_date = QGroupBox(self.tr("Date"))
@@ -187,41 +188,53 @@ class PairCreatorWindow(QDialog):
             return False
 
         new_pair = StudentPair()
-        new_pair.get_value(StudentPairAttrib.Title).set_title(title)
-        new_pair.get_value(StudentPairAttrib.Lecturer).set_lecturer(lecturer)
-        new_pair.get_value(StudentPairAttrib.Type).set_type(pair_type)
-        new_pair.get_value(StudentPairAttrib.Classroom).set_classroom(classes)
-        new_pair.get_value(StudentPairAttrib.Subgroup).set_subgroup(subgroup)
-        new_pair.get_value(StudentPairAttrib.Time).set_time(start_time, end_time)
+        new_pair["title"].set_title(title)
+        new_pair["lecturer"].set_lecturer(lecturer)
+        new_pair["type"].set_type(pair_type)
+        new_pair["classroom"].set_classroom(classes)
+        new_pair["subgroup"].set_subgroup(subgroup)
+        new_pair["time"].set_time(start_time, end_time)
         for date in self._dates:
-            new_pair.get_value(StudentPairAttrib.Date).add_date(date)
+            new_pair["date"].add_date(date)
 
         self._edit_pair = new_pair
 
         return True
 
-    def set_pair(self, pair: StudentPair):
-        self._edit_pair = pair
-        self.line_edit_title.setText(str(self._edit_pair.get_value(StudentPairAttrib.Title)))
-        self.line_edit_lecturer.setText(str(self._edit_pair.get_value(StudentPairAttrib.Lecturer)))
-        self.combo_box_type.setCurrentText(str(self._edit_pair.get_value(StudentPairAttrib.Type)))
-        self.line_edit_classes.setText(str(self._edit_pair.get_value(StudentPairAttrib.Classroom)))
-        self.combo_box_subgroup.setCurrentText(str(self._edit_pair.get_value(StudentPairAttrib.Subgroup)))
+    def set_pair(self, pair: StudentPair) -> None:
+        """
+        Method to set the pair to edit.
 
-        time: TimePair = self._edit_pair.get_value(StudentPairAttrib.Time)
+        :param pair: Pair
+        """
+        self._edit_pair = pair
+        self.line_edit_title.setText(str(self._edit_pair["title"]))
+        self.line_edit_lecturer.setText(str(self._edit_pair["lecturer"]))
+        self.combo_box_type.setCurrentText(str(self._edit_pair["type"]))
+        self.line_edit_classes.setText(str(self._edit_pair["classroom"]))
+        self.combo_box_subgroup.setCurrentText(str(self._edit_pair["subgroup"]))
+
+        time: TimePair = self._edit_pair["time"]
         if time is not None:
             number = time.get_number()
             self.combo_box_start.setCurrentIndex(number)
-            self.combo_box_end.setCurrentIndex(number)
+            self.combo_box_end.clear()
+            self.combo_box_end.addItems(TimePair.time_ends()[number:])
+            self.combo_box_end.setCurrentIndex(time.duration() - 1)
 
-        self._dates = self._edit_pair.get_value(StudentPairAttrib.Date)
+        self._dates = self._edit_pair["date"]
         self.update_list_widget_date()
 
-    def get_pair(self):
+    def get_pair(self) -> (StudentPair, None):
+        """
+        Returns an editable pair.
+        """
         return self._edit_pair
 
-    def push_button_add_date_clicked(self):
-        """ Slot for add date button """
+    def push_button_add_date_clicked(self) -> None:
+        """
+        Slot for add date button.
+        """
         date_creator = DateCreatorWindow(self)
         while True:
             date_creator.exec_()
@@ -238,8 +251,10 @@ class PairCreatorWindow(QDialog):
             else:
                 break
 
-    def push_button_edit_date_clicked(self):
-        """ Slot for edit date button """
+    def push_button_edit_date_clicked(self) -> None:
+        """
+        Slot for edit date button.
+        """
         item = self.list_widget_date.currentItem()
         if item is None:
             QMessageBox.information(self,
@@ -269,8 +284,10 @@ class PairCreatorWindow(QDialog):
                 self._dates.add_date(original_date)
                 break
 
-    def push_button_remove_date_clicked(self):
-        """ Slot for remove date button """
+    def push_button_remove_date_clicked(self) -> None:
+        """
+        Slot for remove date button.
+        """
         item = self.list_widget_date.currentItem()
         if item is None:
             QMessageBox.information(self,
@@ -281,23 +298,34 @@ class PairCreatorWindow(QDialog):
         self._dates.remove_date(item.data(Qt.UserRole))
         self.update_list_widget_date()
 
-    def update_list_widget_date(self):
-        """ Updates the list of dates in the window """
+    def update_list_widget_date(self) -> None:
+        """
+        Updates the list of dates in the window.
+        """
         self.list_widget_date.clear()
         for date in self._dates:
             item = QListWidgetItem(str(date))
             item.setData(Qt.UserRole, date)
             self.list_widget_date.addItem(item)
 
-    def push_button_ok_clicked(self):
-        """ Slot for ok button """
+    def push_button_ok_clicked(self) -> None:
+        """
+        Slot for ok button.
+        """
         if self.save():
             self.close()
 
-    def push_button_cancel_clicked(self):
+    def push_button_cancel_clicked(self) -> None:
+        """
+        Slot for cancel button.
+        """
         self._edit_pair = None
         self.close()
 
-    def combo_box_start_changed(self, index):
-        """ Slot for time change combo_box_end """
-        self.combo_box_end.setCurrentIndex(index)
+    def combo_box_start_changed(self, index) -> None:
+        """
+        Slot to change the end time of the pair.
+        """
+        old_index = self.combo_box_end.currentIndex()
+        self.combo_box_end.clear()
+        self.combo_box_end.addItems(TimePair.time_ends()[index:])
