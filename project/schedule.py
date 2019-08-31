@@ -1,10 +1,10 @@
 # coding: utf-8
 
 # imports
-import xml.etree.ElementTree as Xml
 from project.pair import StudentPair, DateItem, DaysOfWeek
-from project.defaults import SortedList, prettify
+from project.util import SortedList
 from datetime import timedelta, date
+import json
 
 
 class AlongTwoPairsException(Exception):
@@ -73,7 +73,7 @@ class ScheduleElement:
 
         current_date = DateItem(current_date.strftime("%Y.%m.%d"))
         for pair in self._buffer:
-            if current_date in pair["date"]:
+            if current_date in pair["dates"]:
                 pairs.append(pair)
 
         return pairs
@@ -93,9 +93,9 @@ class ScheduleElement:
 
         return []
 
-    def save(self) -> Xml.Element:
+    def save(self) -> dict:
         """
-        Returns an XML pair generator to save them.
+        Returns an dict pair generator to save them.
         """
         for pair in self._buffer:
             yield pair.save()
@@ -114,7 +114,7 @@ class ScheduleElement:
         """
         for pair in self._buffer:
             if added_pair["time"].intersect(pair["time"]):
-                if added_pair["date"] in pair["date"]:
+                if added_pair["dates"] in pair["dates"]:
                     if not added_pair["subgroup"].is_separate() or \
                             not pair["subgroup"].is_separate():
                         raise AlongTwoPairsException("There can't be two pairs at the same time!\n"
@@ -130,11 +130,14 @@ class ScheduleElement:
         :param pair_2: Second pair
         """
         if pair_1["time"].duration() == pair_2["time"].duration():
-            return pair_1["date"] < pair_2["date"]
+            return pair_1["dates"] < pair_2["dates"]
 
         return pair_1["time"].duration() < pair_2["time"].duration()
 
     def __iter__(self) -> dict:
+        if len(self._pair_lines) == 0:
+            yield dict()
+
         for line in reversed(self._pair_lines):
             yield line
 
@@ -168,33 +171,28 @@ class Schedule:
 
     def load(self, path: str) -> None:
         """
-        Load Schedule from XML file
+        Load Schedule from JSON file
 
         :param path: The path to load the schedule
         """
-        tree = Xml.ElementTree(file=path)
-        root = tree.getroot()
-
-        for day_of_week in root:
-            for xml_pair in day_of_week:
-                pair = StudentPair.from_xml(xml_pair)
-                self.add_pair(pair, True)
+        with open(path, "r", encoding="utf-8") as file:
+            all_pairs = json.load(file)
+            for pair in all_pairs:
+                added_pair = StudentPair.from_json(pair)
+                self.add_pair(added_pair, True)
 
     def save(self, path: str) -> None:
         """
-        Save Schedule to XML file
+        Save Schedule to JSON file
         :param path: The path to save the schedule
         """
         with open(path, "w", encoding="utf-8") as file:
-            schedule = Xml.Element("schedule")
-            for day, schedule_element in self._schedule_list.items():
-                element_day = Xml.Element(day.value)
-                for element_pair in schedule_element.save():
-                    element_day.append(element_pair)
+            all_pairs = []
+            for schedule_element in self._schedule_list.values():
+                for pair in schedule_element.save():
+                    all_pairs.append(pair)
 
-                schedule.append(element_day)
-
-            file.write(prettify(schedule))
+            json.dump(all_pairs, file, ensure_ascii=False, indent=4)
 
     def create_week_schedule(self, start_date: date, end_date: date):
         """
@@ -271,7 +269,7 @@ class Schedule:
         :param pair: Added pair
         :param back_mode: True - if it returns a pair, on which there were no changes
         """
-        week_day = pair["date"].get_week_day()
+        week_day = pair["dates"].get_week_day()
         pairs_day = self._schedule_list[week_day]
 
         pairs_day.add_pair(pair)
@@ -289,7 +287,7 @@ class Schedule:
         :param pair: Removed pair
         :param back_mode: True - if the pair is deleted for editing
         """
-        week_day = pair["date"].get_week_day()
+        week_day = pair["dates"].get_week_day()
         pairs_day = self._schedule_list[week_day]
 
         pairs_day.remove_pair(pair)

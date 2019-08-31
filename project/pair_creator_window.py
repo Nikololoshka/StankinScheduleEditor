@@ -5,10 +5,9 @@ from PyQt5.QtWidgets import QDialog, QWidget, QFormLayout, QLineEdit, QLabel, QC
                             QGroupBox, QListWidget, QHBoxLayout, QVBoxLayout, QPushButton, \
                             QMessageBox, QListWidgetItem, QComboBox
 from PyQt5.QtCore import Qt
-from project.pair import StudentPair, TypePairAttrib, \
+from project.pair import StudentPair, TypePairAttrib, LecturerPair, \
                          SubgroupPairAttrib, TimePair, DatePair, InvalidDatePair
 from project.date_creator_window import DateCreatorWindow
-from project import defaults
 
 
 class PairCreatorWindow(QDialog):
@@ -44,7 +43,7 @@ class PairCreatorWindow(QDialog):
         self.line_edit_lecturer = QLineEdit("")
         self.layout_general.setWidget(1, QFormLayout.FieldRole, self.line_edit_lecturer)
 
-        self.completer = QCompleter(defaults.get_lecturers())
+        self.completer = QCompleter(LecturerPair.get_lecturers())
         self.completer.setModelSorting(QCompleter.CaseSensitivelySortedModel)
         self.completer.setCaseSensitivity(Qt.CaseInsensitive)
         self.completer.setFilterMode(Qt.MatchContains)
@@ -195,7 +194,7 @@ class PairCreatorWindow(QDialog):
         new_pair["subgroup"].set_subgroup(subgroup)
         new_pair["time"].set_time(start_time, end_time)
         for date in self._dates:
-            new_pair["date"].add_date(date)
+            new_pair["dates"].add_date(date)
 
         self._edit_pair = new_pair
 
@@ -222,7 +221,7 @@ class PairCreatorWindow(QDialog):
             self.combo_box_end.addItems(TimePair.time_ends()[number:])
             self.combo_box_end.setCurrentIndex(time.duration() - 1)
 
-        self._dates = self._edit_pair["date"]
+        self._dates = self._edit_pair["dates"]
         self.update_list_widget_date()
 
     def get_pair(self) -> (StudentPair, None):

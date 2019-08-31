@@ -8,7 +8,8 @@ from PyQt5.QtCore import QRectF, Qt, QSize, QFileInfo, QPoint, QEvent
 from PyQt5.QtGui import QFont, QFontMetrics, QIcon, QResizeEvent
 
 from project.pair_selector_window import PairSelectorWindow
-from project.export_window import ExportWindow
+from project.exports.export_window import ExportWindow
+from project.imports.import_window import ImportWindow
 from project.settings import SettingsWindow
 from project.schedule import Schedule, AlongTwoPairsException
 from project.pair import DaysOfWeek, TimePair
@@ -69,6 +70,127 @@ class CustomHeaderView(QHeaderView):
         painter.restore()
 
 
+class ScheduleTableWidget(QTableWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._schedule_ref = None
+        self._indexes_ref = None
+
+    def set_schedule(self, schedule: Schedule):
+        self._schedule_ref = schedule
+        self._indexes_ref = self._schedule_ref.indexes()
+        self.update_schedule()
+
+    def update_schedule(self) -> None:
+        self.clearSpans()
+        self.clearContents()
+
+        rows = self._schedule_ref.rows()
+        columns = self._schedule_ref.columns()
+
+        self.setRowCount(rows)
+        self.setColumnCount(columns)
+
+        i = 0
+        for day_number, schedule_element in enumerate(self._schedule_ref):
+            min_i = i
+            for line in schedule_element:
+                j = 0
+                while j < columns:
+                    text = ""
+                    duration = 1
+
+                    pairs = line.get(j)
+                    if pairs is not None:
+                        duration = pairs[0]["time"].duration()
+                        for pair in pairs:
+                            text += str(pair) + "\n"
+
+                    item = QTableWidgetItem(text)
+                    item.setTextAlignment(Qt.AlignTop | Qt.AlignLeft)
+                    item.setData(Qt.UserRole, duration)
+                    self.setItem(i, j, item)
+
+                    j += duration
+                i += 1
+
+            for n in range(columns):
+                for m in range(i - 1, min_i - 1, -1):
+                    item = self.item(m, n)
+                    if item is not None:
+                        up_level, down_level = m, m
+                        duration = item.data(Qt.UserRole)
+                        # down
+                        for p in range(m + 1, i):
+                            free = True
+                            for r in range(duration):
+                                cmp_item = self.item(p, n + r)
+                                if cmp_item is None or cmp_item.text() != "":
+                                    free = False
+                                    break
+                            if free:
+                                down_level = p
+                                for r in range(duration):
+                                    self.takeItem(p, n + r)
+                            else:
+                                break
+                        # up
+                        for p in range(m - 1, min_i - 1, -1):
+                            free = True
+                            for r in range(duration):
+                                cmp_item = self.item(p, n + r)
+                                if cmp_item is None or cmp_item.text() != "":
+                                    free = False
+                                    break
+                            if free:
+                                up_level = p
+                                for r in range(duration):
+                                    self.takeItem(p, n + r)
+                            else:
+                                break
+
+                        if (abs(up_level - down_level) + 1) > 1 or duration > 1:
+                            if self.columnSpan(up_level, n) == 1 or \
+                                    self.rowSpan(up_level, n) == 1:
+                                self.setItem(up_level,
+                                             n,
+                                             self.takeItem(m, n))
+                                self.setSpan(up_level,
+                                             n,
+                                             abs(up_level - down_level) + 1,
+                                             duration)
+
+        self.resize_table()
+
+    def resize_table(self):
+        simple_row = (self.height() - self.horizontalHeader().height()) / 6
+        for i in range(self.rowCount()):
+            new_index = i
+            for k, value in enumerate(self._indexes_ref):
+                new_index -= value
+                if new_index < 0:
+                    new_index = k
+                    break
+            size = int(simple_row / self._indexes_ref[new_index])
+            self.verticalHeader().resizeSection(i, size)
+
+        for i in range(self.rowCount()):
+            for j in range(self.columnCount()):
+                item = self.item(i, j)
+                if item is not None:
+                    size = QSize(self.columnWidth(item.column()) *
+                                 self.columnSpan(item.row(), item.column()),
+                                 self.rowHeight(item.row()) *
+                                 self.rowSpan(item.row(), item.column()))
+                    item.setFont(compute_font_for_text(item.text(),
+                                                       Qt.AlignTop | Qt.AlignLeft | Qt.TextWordWrap,
+                                                       size))
+
+    def resizeEvent(self, event: QResizeEvent) -> None:
+        self.resize_table()
+        super().resizeEvent(event)
+
+
 class ScheduleEditorWindow(QMainWindow):
     """
     Class describing the main window of the program.
@@ -85,7 +207,8 @@ class ScheduleEditorWindow(QMainWindow):
         self.setMinimumSize(800, 600)
 
         # central widget settings
-        self.table_widget = QTableWidget()
+        self.table_widget = ScheduleTableWidget()
+        self.table_widget.set_schedule(self._schedule)
         self.table_widget.setVerticalHeader(CustomHeaderView(Qt.Vertical, self._indexes_ref))
         self.table_widget.setHorizontalHeader(CustomHeaderView(Qt.Horizontal))
         self.table_widget.setWordWrap(True)
@@ -138,6 +261,10 @@ class ScheduleEditorWindow(QMainWindow):
         self.action_export.setShortcut("Ctrl+E")
         self.menu_file.addAction(self.action_export)
 
+        self.action_import = QAction(self.tr("Import"), self)
+        self.action_import.setShortcut("Ctrl+I")
+        self.menu_file.addAction(self.action_import)
+
         self.menu_file.addSeparator()
 
         self.action_settings = QAction(self.tr("Settings"), self)
@@ -159,6 +286,7 @@ class ScheduleEditorWindow(QMainWindow):
         self.action_save.triggered.connect(self.action_save_clicked)
         self.action_save_as.triggered.connect(self.action_save_as_clicked)
         self.action_export.triggered.connect(self.action_export_clicked)
+        self.action_import.triggered.connect(self.action_import_clicked)
         self.action_settings.triggered.connect(self.action_settings_clicked)
         self.action_about.triggered.connect(self.action_about_clicked)
         self.action_exit.triggered.connect(self.close)
@@ -168,10 +296,15 @@ class ScheduleEditorWindow(QMainWindow):
         self.table_widget.customContextMenuRequested.connect(self.context_menu_requested)
 
     # def test(self) -> None:
-    #    """
-    #    Method for tests.
-    #    """
-    #    print(self.table_widget.currentRow(), self.table_widget.currentColumn())
+    #     """
+    #     Method for tests.
+    #     """
+    #     item = self.table_widget.currentItem()
+    #     if item is not None:
+    #         print(item.row(),
+    #               item.column(),
+    #               self.table_widget.rowSpan(item.row(), item.column()),
+    #               self.table_widget.columnSpan(item.row(), item.column()))
 
     def changeEvent(self, event: QEvent) -> None:
         if event.type() == QEvent.LanguageChange:
@@ -182,6 +315,7 @@ class ScheduleEditorWindow(QMainWindow):
             self.action_save.setText(self.tr("&Save"))
             self.action_save_as.setText(self.tr("Save as..."))
             self.action_export.setText(self.tr("Export"))
+            self.action_import.setText(self.tr("Import"))
             self.action_settings.setText(self.tr("Settings"))
             self.action_about.setText(self.tr("About"))
             self.action_exit.setText(self.tr("&Quit"))
@@ -190,40 +324,13 @@ class ScheduleEditorWindow(QMainWindow):
                 item = QTableWidgetItem(day)
                 self.table_widget.setVerticalHeaderItem(i, item)
 
-            self.update_table_widget()
+            self.table_widget.update_schedule()
         else:
             super().changeEvent(event)
 
-    def resizeEvent(self, a0: QResizeEvent) -> None:
-        self.resize_table_widget()
-        super().resizeEvent(a0)
-
-    def resize_table_widget(self) -> None:
-        """
-        Method for resizing a table.
-        """
-        simple_row = (self.table_widget.height() - self.table_widget.horizontalHeader().height()) / 6
-        for i in range(self.table_widget.rowCount()):
-            new_index = i
-            for k, value in enumerate(self._indexes_ref):
-                new_index -= value
-                if new_index < 0:
-                    new_index = k
-                    break
-            size = int(simple_row / self._indexes_ref[new_index])
-            self.table_widget.verticalHeader().resizeSection(i, size)
-
-        for i in range(self.table_widget.rowCount()):
-            for j in range(self.table_widget.columnCount()):
-                item = self.table_widget.item(i, j)
-                if item is not None:
-                    size = QSize(self.table_widget.columnWidth(item.column()) *
-                                 self.table_widget.columnSpan(item.row(), item.column()),
-                                 self.table_widget.rowHeight(item.row()) *
-                                 self.table_widget.rowSpan(item.row(), item.column()))
-                    item.setFont(compute_font_for_text(item.text(),
-                                                       Qt.AlignTop | Qt.AlignLeft | Qt.TextWordWrap,
-                                                       size))
+    def resizeEvent(self, event: QResizeEvent) -> None:
+        self.table_widget.resize_table()
+        super().resizeEvent(event)
 
     def context_menu_requested(self, pos: QPoint) -> None:
         """
@@ -238,88 +345,6 @@ class ScheduleEditorWindow(QMainWindow):
         menu.addAction(action_edit)
 
         menu.popup(self.table_widget.viewport().mapToGlobal(pos))
-
-    def update_table_widget(self) -> None:
-        """
-        Updates the schedule table.
-        """
-        self.table_widget.clearSpans()
-        self.table_widget.clearContents()
-
-        rows = self._schedule.rows()
-        columns = self._schedule.columns()
-
-        self.table_widget.setRowCount(rows)
-        self.table_widget.setColumnCount(columns)
-
-        i = 0
-        for day_number, schedule_element in enumerate(self._schedule):
-            min_i = i
-            for line in schedule_element:
-                j = 0
-                while j < columns:
-                    text = ""
-                    duration = 1
-
-                    pairs = line.get(j)
-                    if pairs is not None:
-                        duration = pairs[0]["time"].duration()
-                        for pair in pairs:
-                            text += str(pair) + "\n"
-
-                    item = QTableWidgetItem(text)
-                    item.setTextAlignment(Qt.AlignTop | Qt.AlignLeft)
-                    item.setData(Qt.UserRole, duration)
-                    self.table_widget.setItem(i, j, item)
-
-                    j += duration
-                i += 1
-
-            for n in range(columns):
-                for m in range(i - 1, min_i - 1, -1):
-                    item = self.table_widget.item(m, n)
-                    if item is not None:
-                        up_level, down_level = m, m
-                        duration = item.data(Qt.UserRole)
-                        # down
-                        for p in range(m + 1, i):
-                            free = True
-                            for r in range(duration):
-                                cmp_item = self.table_widget.item(p, n + r)
-                                if cmp_item is None or cmp_item.text() != "":
-                                    free = False
-                                    break
-                            if free:
-                                down_level = p
-                                for r in range(duration):
-                                    self.table_widget.takeItem(p, n + r)
-                            else:
-                                break
-                        # up
-                        for p in range(m - 1, min_i - 1, -1):
-                            free = True
-                            for r in range(duration):
-                                cmp_item = self.table_widget.item(p, n + r)
-                                if cmp_item is None or cmp_item.text() != "":
-                                    free = False
-                                    break
-                            if free:
-                                up_level = p
-                                for r in range(duration):
-                                    self.table_widget.takeItem(p, n + r)
-                            else:
-                                break
-
-                        if (abs(up_level - down_level) + 1) > 1 or duration > 1:
-                            self.table_widget.setItem(up_level,
-                                                      n,
-                                                      self.table_widget.takeItem(m, n))
-                            self.table_widget.setSpan(up_level,
-                                                      n,
-                                                      abs(up_level - down_level) + 1,
-                                                      duration)
-
-        self.resize_table_widget()
 
     def action_new_file_clicked(self) -> bool:
         """
@@ -340,7 +365,7 @@ class ScheduleEditorWindow(QMainWindow):
                 return False
 
         self._schedule.clear()
-        self.update_table_widget()
+        self.table_widget.update_schedule()
         self.setWindowTitle(self.tr("Schedule Editor"))
         return True
 
@@ -353,9 +378,9 @@ class ScheduleEditorWindow(QMainWindow):
                 return
 
         path = QFileDialog.getOpenFileName(self,
-                                           self.tr("Open schedule from XML file"),
+                                           self.tr("Open schedule from JSON file"),
                                            ".",
-                                           "XML file (*.xml)")[0]
+                                           "JSON file (*.json)")[0]
         if path == "":
             return
 
@@ -375,7 +400,7 @@ class ScheduleEditorWindow(QMainWindow):
         self._file = QFileInfo(path)
         self.statusBar().showMessage(self.tr("Load file: ") + path, 5000)
         self.setWindowTitle(self.tr("Schedule Editor [{}]").format(self._file.absoluteFilePath()))
-        self.update_table_widget()
+        self.table_widget.update_schedule()
 
     def action_save_clicked(self) -> None:
         """
@@ -393,14 +418,14 @@ class ScheduleEditorWindow(QMainWindow):
         Slot to save the file if it has not been saved before.
         """
         path = QFileDialog.getSaveFileName(self,
-                                           self.tr("Save schedule as XML file"),
+                                           self.tr("Save schedule as JSON file"),
                                            "./examples",
-                                           "XML file (*.xml)")[0]
+                                           "JSON file (*.json)")[0]
         if path == "":
             return
 
-        if not path.endswith(".xml"):
-            path += ".xml"
+        if not path.endswith(".json"):
+            path += ".json"
 
         self._schedule.save(path)
         self._file = QFileInfo(path)
@@ -409,10 +434,17 @@ class ScheduleEditorWindow(QMainWindow):
 
     def action_export_clicked(self) -> None:
         """
-        Slot for schedule export to PDF.
+        Slot for schedule exports to PDF.
          """
         exporter = ExportWindow(self._schedule, self)
         exporter.exec_()
+
+    def action_import_clicked(self) -> None:
+        """
+        Slot for schedule imports from PDF.
+        """
+        importer = ImportWindow(self)
+        importer.exec_()
 
     def action_settings_clicked(self) -> None:
         """
@@ -421,7 +453,7 @@ class ScheduleEditorWindow(QMainWindow):
         settings = SettingsWindow(self)
         settings.exec_()
 
-        self.update_table_widget()
+        self.table_widget.update_schedule()
 
     def action_about_clicked(self) -> None:
         """
@@ -460,7 +492,7 @@ class ScheduleEditorWindow(QMainWindow):
         day, number, duration = self._schedule.normalize_index(day, number, duration)
 
         selector = PairSelectorWindow(self._schedule, day, number, duration, self)
-        selector.pairsListChanged.connect(self.update_table_widget)
+        selector.pairsListChanged.connect(self.table_widget.update_schedule)
         selector.exec_()
 
-        self.update_table_widget()
+        self.table_widget.update_schedule()

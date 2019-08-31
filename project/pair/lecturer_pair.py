@@ -15,10 +15,18 @@ class LecturerPair(AttribPair):
         self._lecturer: str = s
 
     @staticmethod
-    def from_xml_pair(file: Xml.Element):
+    def from_json_pair(file):
         lecturer = LecturerPair()
-        lecturer.load(file.find("lecturer"))
+        lecturer.load(file)
         return lecturer
+
+    @staticmethod
+    def get_lecturers() -> set:
+        """
+        Returns a list of lecturers
+        """
+        with open("./res/lecturers.txt", "r", encoding="utf-8") as file:
+            return set(line for line in file)
 
     def set_lecturer(self, s: str):
         """
@@ -27,13 +35,11 @@ class LecturerPair(AttribPair):
         """
         self._lecturer = s
 
-    def load(self, el: Xml.Element) -> None:
-        self._lecturer = el.text
+    def load(self, json_element) -> None:
+        self._lecturer = json_element["lecturer"]
 
-    def save(self) -> Xml.Element:
-        element = Xml.Element("lecturer")
-        element.text = self._lecturer
-        return element
+    def save(self) -> str:
+        return self._lecturer
 
     def copy(self):
         new_lecturer = LecturerPair(self._lecturer)

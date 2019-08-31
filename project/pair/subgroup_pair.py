@@ -50,9 +50,9 @@ class SubgroupPair(AttribPair):
         self._subgroup: SubgroupPairAttrib = subgroup
 
     @staticmethod
-    def from_xml_pair(file: Xml.Element):
+    def from_json_pair(file):
         subgroup = SubgroupPair()
-        subgroup.load(file.find("subgroup"))
+        subgroup.load(file)
         return subgroup
 
     def set_subgroup(self, subgroup: SubgroupPairAttrib):
@@ -79,13 +79,11 @@ class SubgroupPair(AttribPair):
 
         return False
 
-    def load(self, el: Xml.Element) -> None:
-        self._subgroup = SubgroupPairAttrib.value_of(el.text)
+    def load(self, json_element) -> None:
+        self._subgroup = SubgroupPairAttrib.value_of(json_element["subgroup"])
 
-    def save(self) -> Xml.Element:
-        element = Xml.Element("subgroup")
-        element.text = self._subgroup.name
-        return element
+    def save(self) -> str:
+        return self._subgroup.name
 
     def copy(self):
         new_subgroup = SubgroupPair(self._subgroup)

@@ -14,9 +14,9 @@ class ClassroomPair(AttribPair):
         self._classroom: str = s
 
     @staticmethod
-    def from_xml_pair(file: Xml.Element):
+    def from_json_pair(file):
         classroom = ClassroomPair()
-        classroom.load(file.find("classroom"))
+        classroom.load(file)
         return classroom
 
     def set_classroom(self, s: str) -> None:
@@ -27,13 +27,11 @@ class ClassroomPair(AttribPair):
         """
         self._classroom = s
 
-    def load(self, el: Xml.Element) -> None:
-        self._classroom = el.text
+    def load(self, json_element) -> None:
+        self._classroom = json_element["classroom"]
 
-    def save(self) -> Xml.Element:
-        element = Xml.Element("classroom")
-        element.text = self._classroom
-        return element
+    def save(self) -> str:
+        return self._classroom
 
     def copy(self):
         new_classroom = ClassroomPair(self._classroom)

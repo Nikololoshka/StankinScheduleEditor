@@ -63,9 +63,9 @@ class TypePair(AttribPair):
         self._type: TypePairAttrib = t
 
     @staticmethod
-    def from_xml_pair(file: Xml.Element):
+    def from_json_pair(file):
         t = TypePair()
-        t.load(file.find("type"))
+        t.load(file)
         return t
 
     def set_type(self, t: TypePairAttrib):
@@ -76,13 +76,11 @@ class TypePair(AttribPair):
         """
         self._type = t
 
-    def load(self, el: Xml.Element) -> None:
-        self._type = TypePairAttrib.value_of(el.text)
+    def load(self, json_element) -> None:
+        self._type = TypePairAttrib.value_of(json_element["type"])
 
-    def save(self) -> Xml.Element:
-        element = Xml.Element("type")
-        element.text = self._type.name
-        return element
+    def save(self) -> str:
+        return self._type.name
 
     def copy(self):
         new_type = TypePair(self._type)

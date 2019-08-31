@@ -57,6 +57,7 @@ class DaysOfWeekTranslator(QObject):
     """
     A helper class to translate the enumeration of the days of the week.
     """
+
     def translate(self, day: DaysOfWeek) -> str:
         """
         Returns the translation of the day of the week.
@@ -96,6 +97,7 @@ class FrequencyDateTranslator(QObject):
     """
     A helper class to translate the enumeration of the frequency of student classes.
     """
+
     def translate(self, frequency: FrequencyDate) -> str:
         """
         Returns the translation of the frequency of student classes.
@@ -111,6 +113,7 @@ class InvalidDatePair(Exception):
     """
     Class that describes errors associated with the date.
     """
+
     def __init__(self, msg):
         self._msg = msg
 
@@ -122,6 +125,7 @@ class DateItem:
     """
     Class that describes the element of dates.
     """
+
     def __init__(self, str_date):
         self.date: str = str_date
 
@@ -135,13 +139,12 @@ class DateItem:
         """
         return datetime.strptime(date_str, "%Y.%m.%d").strftime("%d.%m")
 
-    def save(self) -> Xml.Element:
+    def save(self) -> dict:
         """
         Save DateItem to XML file
         """
-        element = Xml.Element("date", {"frequency": FrequencyDate.Once.value})
-        element.text = self.date
-        return element
+        return {"frequency": FrequencyDate.Once.value,
+                "date": self.date}
 
     def get_week_day(self) -> str:
         """
@@ -225,18 +228,18 @@ class DateRange:
     """
     Class that describes the date range.
     """
+
     def __init__(self, date_from, date_to, frequency):
         self.date_from: str = date_from
         self.date_to: str = date_to
         self.frequency: FrequencyDate = frequency
 
-    def save(self) -> Xml.Element:
+    def save(self) -> dict:
         """
         Save DateItem to XML file.
         """
-        element = Xml.Element("date", {"frequency": self.frequency.value})
-        element.text = "{}-{}".format(self.date_from, self.date_to)
-        return element
+        return {"frequency": self.frequency.value,
+                "date": "{}-{}".format(self.date_from, self.date_to)}
 
     def get_week_day(self) -> str:
         """
@@ -304,36 +307,37 @@ class DateRange:
     def __contains__(self, item):
         """ Return key in self. """
         if isinstance(item, DateItem):
-            if self.frequency == FrequencyDate.Every:
-                delta = timedelta(days=7)
-            elif self.frequency == FrequencyDate.Throughout:
-                delta = timedelta(days=14)
-            else:
-                raise InvalidDatePair("Incorrect \"frequency\" values for the date")
-
-            start = datetime.strptime(self.date_from, "%Y.%m.%d")
-            end = datetime.strptime(self.date_to, "%Y.%m.%d")
-
-            while True:
-                if item == DateItem(start.strftime("%Y.%m.%d")):
+            for date in self:
+                if item == DateItem(date):
                     return True
-
-                start += delta
-
-                if start > end:
-                    break
 
             return False
 
         if isinstance(item, DateRange):
-            if item.date_from > self.date_from and item.date_from > self.date_to or \
-                    item.date_to < self.date_from and item.date_to < self.date_to:
-                return False
+            for first_date in self:
+                for second_date in item:
+                    if first_date == second_date:
+                        return True
 
-            return True
+            return False
 
         raise InvalidDatePair("Impossible to compare: {} with {}"
                               .format(self.__class__.__name__, item.__class__.__name__))
+
+    def __iter__(self):
+        if self.frequency == FrequencyDate.Every:
+            delta = timedelta(days=7)
+        elif self.frequency == FrequencyDate.Throughout:
+            delta = timedelta(days=14)
+        else:
+            raise InvalidDatePair("Incorrect \"frequency\" values for the date")
+
+        start = datetime.strptime(self.date_from, "%Y.%m.%d")
+        end = datetime.strptime(self.date_to, "%Y.%m.%d")
+
+        while start <= end:
+            yield start.strftime("%Y.%m.%d")
+            start += delta
 
     def __str__(self):
         return "{}-{} {}".format(DateItem.compact_date(self.date_from),
@@ -345,37 +349,38 @@ class DatePair(AttribPair):
     """
     Class describing the dates of student pairs.
     """
+
     def __init__(self):
         super().__init__()
         self._dates = list()
         self._week_day = None
 
     @staticmethod
-    def from_xml_pair(file: Xml.Element):
+    def from_json_pair(file):
         d = DatePair()
-        d.load(file.find("dates"))
+        d.load(file["dates"])
         return d
 
-    def load(self, el: Xml.Element) -> None:
-        for date_tag in el:
+    def load(self, json_element) -> None:
+        for json_date in json_element:
             try:
-                frequency = FrequencyDate.value_of(date_tag.attrib["frequency"])
+                frequency = FrequencyDate.value_of(json_date["frequency"])
 
                 if frequency == FrequencyDate.Once:
-                    date_parse = DateItem(date_tag.text)
+                    date_parse = DateItem(json_date["date"])
                 else:
-                    date_parse = DateRange(*date_tag.text.split("-"), frequency)
+                    date_parse = DateRange(*json_date["date"].split("-"), frequency)
 
                 self.add_date(date_parse)
 
             except KeyError:
                 raise InvalidDatePair("Could not read the \"date\", because the frequency \"{}\" is not correct"
-                                      .format(date_tag.attrib["frequency"]))
+                                      .format(json_date["frequency"]))
 
-    def save(self) -> Xml.Element:
-        element = Xml.Element("dates")
-        for x in self._dates:
-            element.append(x.save())
+    def save(self) -> list:
+        element = []
+        for date in self._dates:
+            element.append(date.save())
 
         return element
 
@@ -401,7 +406,8 @@ class DatePair(AttribPair):
                 raise InvalidDatePair("Dates have a different day of the week")
 
         if date_item in self:
-            raise InvalidDatePair("Date crosses existing dates")
+            raise InvalidDatePair("Date crosses existing dates. ["
+                                  + str(date_item) + "] , [" + str(self) + "]")
 
         i = 0
         while i < len(self._dates):

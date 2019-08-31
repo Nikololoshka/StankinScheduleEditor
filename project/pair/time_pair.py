@@ -57,26 +57,16 @@ class TimePair(AttribPair):
         return self._start_number
 
     @staticmethod
-    def from_xml_pair(file: Xml.Element):
+    def from_json_pair(file):
         time = TimePair()
-        time.load(file.find("time"))
+        time.load(file["time"])
         return time
 
-    def load(self, el: Xml.Element) -> None:
-        self.set_time(el.findtext("start"),
-                      el.findtext("end"),
-                      el.attrib.get("duration"))
+    def load(self, json_element) -> None:
+        self.set_time(json_element["start"], json_element["end"])
 
-    def save(self) -> Xml.Element:
-        element = Xml.Element("time")
-
-        sub_element = Xml.SubElement(element, "start")
-        sub_element.text = self._start
-
-        sub_element = Xml.SubElement(element, "end")
-        sub_element.text = self._end
-
-        return element
+    def save(self) -> dict:
+        return {"start": self._start, "end": self._end}
 
     def copy(self):
         new_time = TimePair()

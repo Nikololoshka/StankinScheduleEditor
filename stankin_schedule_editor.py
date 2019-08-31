@@ -2,6 +2,7 @@
 # coding: utf-8
 
 # imports
+import os
 import sys
 
 from PyQt5.QtCore import QTranslator
@@ -11,6 +12,10 @@ from project.schedule_editor_window import ScheduleEditorWindow
 from project.settings import Settings
 
 from res import resources
+
+
+os.environ["OMP_THREAD_LIMIT"] = "1"
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

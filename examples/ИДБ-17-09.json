@@ -1,0 +1,946 @@
+[
+    {
+        "title": "Прикладная физическая культура",
+        "lecturer": "",
+        "type": "Lecture",
+        "subgroup": "Common",
+        "classroom": "С/3 СТАНКИН",
+        "time": {
+            "start": "12:20",
+            "end": "14:00"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.02.04"
+            }
+        ]
+    },
+    {
+        "title": "Прикладная физическая культура",
+        "lecturer": "",
+        "type": "Seminar",
+        "subgroup": "Common",
+        "classroom": "С/З СТАНКИН",
+        "time": {
+            "start": "12:20",
+            "end": "14:00"
+        },
+        "dates": [
+            {
+                "frequency": "every",
+                "date": "2019.02.11-2019.05.20"
+            }
+        ]
+    },
+    {
+        "title": "Иностранный язык",
+        "lecturer": "Стихова О.В",
+        "type": "Seminar",
+        "subgroup": "Common",
+        "classroom": "",
+        "time": {
+            "start": "14:10",
+            "end": "15:50"
+        },
+        "dates": [
+            {
+                "frequency": "every",
+                "date": "2019.02.04-2019.05.20"
+            }
+        ]
+    },
+    {
+        "title": "Операционные системы",
+        "lecturer": "Семячкова Е.Г",
+        "type": "Laboratory",
+        "subgroup": "A",
+        "classroom": "247",
+        "time": {
+            "start": "16:00",
+            "end": "19:30"
+        },
+        "dates": [
+            {
+                "frequency": "throughout",
+                "date": "2019.02.11-2019.03.25"
+            }
+        ]
+    },
+    {
+        "title": "Операционные системы",
+        "lecturer": "Семячкова Е.Г",
+        "type": "Laboratory",
+        "subgroup": "B",
+        "classroom": "247",
+        "time": {
+            "start": "16:00",
+            "end": "19:30"
+        },
+        "dates": [
+            {
+                "frequency": "throughout",
+                "date": "2019.02.18-2019.04.01"
+            }
+        ]
+    },
+    {
+        "title": "Базы данных",
+        "lecturer": "Бычкова Н.А",
+        "type": "Laboratory",
+        "subgroup": "A",
+        "classroom": "247",
+        "time": {
+            "start": "16:00",
+            "end": "19:30"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.04.08"
+            }
+        ]
+    },
+    {
+        "title": "Базы данных",
+        "lecturer": "Бычкова Н.А",
+        "type": "Laboratory",
+        "subgroup": "B",
+        "classroom": "247",
+        "time": {
+            "start": "16:00",
+            "end": "19:30"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.04.15"
+            }
+        ]
+    },
+    {
+        "title": "Компьютерная механика",
+        "lecturer": "Чеканин В.А",
+        "type": "Lecture",
+        "subgroup": "Common",
+        "classroom": "0408",
+        "time": {
+            "start": "10:20",
+            "end": "12:00"
+        },
+        "dates": [
+            {
+                "frequency": "every",
+                "date": "2019.02.05-2019.03.19"
+            }
+        ]
+    },
+    {
+        "title": "Экономика",
+        "lecturer": "Крючкова Е.В",
+        "type": "Seminar",
+        "subgroup": "Common",
+        "classroom": "341",
+        "time": {
+            "start": "12:20",
+            "end": "14:00"
+        },
+        "dates": [
+            {
+                "frequency": "every",
+                "date": "2019.02.19-2019.03.26"
+            }
+        ]
+    },
+    {
+        "title": "Численные методы",
+        "lecturer": "Третяк И.С",
+        "type": "Seminar",
+        "subgroup": "Common",
+        "classroom": "0810",
+        "time": {
+            "start": "12:20",
+            "end": "14:00"
+        },
+        "dates": [
+            {
+                "frequency": "every",
+                "date": "2019.04.02-2019.05.07"
+            }
+        ]
+    },
+    {
+        "title": "Теория вероятностей и математическая статистика",
+        "lecturer": "Казаков О.А",
+        "type": "Lecture",
+        "subgroup": "Common",
+        "classroom": "0811",
+        "time": {
+            "start": "14:10",
+            "end": "15:50"
+        },
+        "dates": [
+            {
+                "frequency": "every",
+                "date": "2019.02.05-2019.05.07"
+            }
+        ]
+    },
+    {
+        "title": "Численные методы",
+        "lecturer": "Третяк И.С",
+        "type": "Lecture",
+        "subgroup": "Common",
+        "classroom": "0204",
+        "time": {
+            "start": "16:00",
+            "end": "17:40"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.02.05"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.02.12"
+            }
+        ]
+    },
+    {
+        "title": "Базы данных",
+        "lecturer": "Бычкова Н.А",
+        "type": "Laboratory",
+        "subgroup": "B",
+        "classroom": "247",
+        "time": {
+            "start": "16:00",
+            "end": "19:30"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.03.19"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.04.02"
+            }
+        ]
+    },
+    {
+        "title": "Базы данных",
+        "lecturer": "Бычкова Н.А",
+        "type": "Laboratory",
+        "subgroup": "A",
+        "classroom": "247",
+        "time": {
+            "start": "16:00",
+            "end": "19:30"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.03.12"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.03.26"
+            }
+        ]
+    },
+    {
+        "title": "Численные методы",
+        "lecturer": "Третяк И.С",
+        "type": "Lecture",
+        "subgroup": "Common",
+        "classroom": "0204",
+        "time": {
+            "start": "8:30",
+            "end": "10:10"
+        },
+        "dates": [
+            {
+                "frequency": "every",
+                "date": "2019.02.06-2019.03.20"
+            }
+        ]
+    },
+    {
+        "title": "Компьютерная механика",
+        "lecturer": "Чеканин В.А",
+        "type": "Seminar",
+        "subgroup": "Common",
+        "classroom": "408",
+        "time": {
+            "start": "10:20",
+            "end": "12:00"
+        },
+        "dates": [
+            {
+                "frequency": "every",
+                "date": "2019.02.13-2019.03.20"
+            }
+        ]
+    },
+    {
+        "title": "Компьютерная механика",
+        "lecturer": "Чеканин В.А",
+        "type": "Lecture",
+        "subgroup": "Common",
+        "classroom": "0309",
+        "time": {
+            "start": "12:20",
+            "end": "14:00"
+        },
+        "dates": [
+            {
+                "frequency": "every",
+                "date": "2019.02.06-2019.03.20"
+            }
+        ]
+    },
+    {
+        "title": "Прикладная физическая культура",
+        "lecturer": "",
+        "type": "Lecture",
+        "subgroup": "Common",
+        "classroom": "C/3 CTAHKUH",
+        "time": {
+            "start": "14:10",
+            "end": "15:50"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.02.06"
+            }
+        ]
+    },
+    {
+        "title": "Иностранный язык",
+        "lecturer": "Стихова О.В",
+        "type": "Seminar",
+        "subgroup": "Common",
+        "classroom": "",
+        "time": {
+            "start": "10:20",
+            "end": "12:00"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.03.27"
+            }
+        ]
+    },
+    {
+        "title": "Численные методы",
+        "lecturer": "Третяк И.С",
+        "type": "Lecture",
+        "subgroup": "Common",
+        "classroom": "0204",
+        "time": {
+            "start": "12:20",
+            "end": "14:00"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.03.27"
+            }
+        ]
+    },
+    {
+        "title": "Прикладная физическая культура",
+        "lecturer": "",
+        "type": "Seminar",
+        "subgroup": "Common",
+        "classroom": "С/З СТАНКИН",
+        "time": {
+            "start": "14:10",
+            "end": "15:50"
+        },
+        "dates": [
+            {
+                "frequency": "every",
+                "date": "2019.02.13-2019.04.24"
+            },
+            {
+                "frequency": "every",
+                "date": "2019.05.08-2019.05.22"
+            }
+        ]
+    },
+    {
+        "title": "Компьютерная механика",
+        "lecturer": "Чеканин В.А",
+        "type": "Laboratory",
+        "subgroup": "A",
+        "classroom": "216",
+        "time": {
+            "start": "16:00",
+            "end": "19:30"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.04.17"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.05.15"
+            }
+        ]
+    },
+    {
+        "title": "Компьютерная механика",
+        "lecturer": "Чеканин В.А",
+        "type": "Laboratory",
+        "subgroup": "B",
+        "classroom": "216",
+        "time": {
+            "start": "16:00",
+            "end": "19:30"
+        },
+        "dates": [
+            {
+                "frequency": "throughout",
+                "date": "2019.04.10-2019.05.22"
+            }
+        ]
+    },
+    {
+        "title": "Инновационные технологии и автоматизированные комплексы цифрового машиностроительного производства",
+        "lecturer": "Солис П",
+        "type": "Lecture",
+        "subgroup": "Common",
+        "classroom": "0209",
+        "time": {
+            "start": "8:30",
+            "end": "10:10"
+        },
+        "dates": [
+            {
+                "frequency": "every",
+                "date": "2019.02.07-2019.04.25"
+            }
+        ]
+    },
+    {
+        "title": "Модели и методы теории вычислений",
+        "lecturer": "Бритвина В.В",
+        "type": "Lecture",
+        "subgroup": "Common",
+        "classroom": "0208",
+        "time": {
+            "start": "10:20",
+            "end": "12:00"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.03.21"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.03.28"
+            }
+        ]
+    },
+    {
+        "title": "Модели и методы теории вычислений",
+        "lecturer": "Бритвина В.В",
+        "type": "Lecture",
+        "subgroup": "Common",
+        "classroom": "0207",
+        "time": {
+            "start": "10:20",
+            "end": "12:00"
+        },
+        "dates": [
+            {
+                "frequency": "every",
+                "date": "2019.02.07-2019.03.14"
+            },
+            {
+                "frequency": "every",
+                "date": "2019.04.04-2019.04.25"
+            }
+        ]
+    },
+    {
+        "title": "Экономика",
+        "lecturer": "Крючкова Е.В",
+        "type": "Lecture",
+        "subgroup": "Common",
+        "classroom": "0206",
+        "time": {
+            "start": "12:20",
+            "end": "14:00"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.02.07"
+            }
+        ]
+    },
+    {
+        "title": "Базы данных",
+        "lecturer": "Бычкова Н.А",
+        "type": "Lecture",
+        "subgroup": "Common",
+        "classroom": "0206",
+        "time": {
+            "start": "14:10",
+            "end": "15:50"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.02.07"
+            }
+        ]
+    },
+    {
+        "title": "Экономика",
+        "lecturer": "Крючкова Е.В",
+        "type": "Lecture",
+        "subgroup": "Common",
+        "classroom": "0408",
+        "time": {
+            "start": "12:20",
+            "end": "14:00"
+        },
+        "dates": [
+            {
+                "frequency": "every",
+                "date": "2019.02.14-2019.04.11"
+            }
+        ]
+    },
+    {
+        "title": "Базы данных",
+        "lecturer": "Бычкова Н.А",
+        "type": "Lecture",
+        "subgroup": "Common",
+        "classroom": "0207",
+        "time": {
+            "start": "14:10",
+            "end": "15:50"
+        },
+        "dates": [
+            {
+                "frequency": "every",
+                "date": "2019.02.14-2019.04.11"
+            }
+        ]
+    },
+    {
+        "title": "Базы данных",
+        "lecturer": "Бычкова Н.А",
+        "type": "Seminar",
+        "subgroup": "Common",
+        "classroom": "0810",
+        "time": {
+            "start": "12:20",
+            "end": "14:00"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.04.18"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.04.25"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.05.16"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.05.23"
+            }
+        ]
+    },
+    {
+        "title": "Модели и методы теории вычислений",
+        "lecturer": "Бритвина В.В",
+        "type": "Seminar",
+        "subgroup": "Common",
+        "classroom": "0811",
+        "time": {
+            "start": "14:10",
+            "end": "15:50"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.04.18"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.04.25"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.05.16"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.05.23"
+            }
+        ]
+    },
+    {
+        "title": "Инновационные технологии и автоматизированные комплексы цифрового машиностроительного производства",
+        "lecturer": "Пристинский Ю.О",
+        "type": "Seminar",
+        "subgroup": "Common",
+        "classroom": "341",
+        "time": {
+            "start": "12:20",
+            "end": "14:00"
+        },
+        "dates": [
+            {
+                "frequency": "every",
+                "date": "2019.02.15-2019.03.01"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.03.15"
+            }
+        ]
+    },
+    {
+        "title": "Иностранный язык",
+        "lecturer": "Стихова О.В",
+        "type": "Seminar",
+        "subgroup": "Common",
+        "classroom": "",
+        "time": {
+            "start": "12:20",
+            "end": "14:00"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.04.05"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.04.12"
+            }
+        ]
+    },
+    {
+        "title": "Теория вероятностей и математическая статистика",
+        "lecturer": "Девятерикова Е.А",
+        "type": "Seminar",
+        "subgroup": "Common",
+        "classroom": "0811",
+        "time": {
+            "start": "12:20",
+            "end": "14:00"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.05.24"
+            }
+        ]
+    },
+    {
+        "title": "Теория вероятностей и математическая статистика",
+        "lecturer": "Девятерикова Е.А",
+        "type": "Seminar",
+        "subgroup": "Common",
+        "classroom": "0811",
+        "time": {
+            "start": "14:10",
+            "end": "15:50"
+        },
+        "dates": [
+            {
+                "frequency": "every",
+                "date": "2019.02.15-2019.03.01"
+            },
+            {
+                "frequency": "every",
+                "date": "2019.03.15-2019.04.26"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.05.17"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.05.24"
+            }
+        ]
+    },
+    {
+        "title": "Теория вероятностей и математическая статистика",
+        "lecturer": "Девятерикова Е.А",
+        "type": "Seminar",
+        "subgroup": "Common",
+        "classroom": "0811",
+        "time": {
+            "start": "16:00",
+            "end": "17:40"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.05.17"
+            }
+        ]
+    },
+    {
+        "title": "Численные методы",
+        "lecturer": "Третяк И.С",
+        "type": "Laboratory",
+        "subgroup": "B",
+        "classroom": "357(3)",
+        "time": {
+            "start": "16:00",
+            "end": "19:30"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.03.29"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.04.12"
+            }
+        ]
+    },
+    {
+        "title": "Численные методы",
+        "lecturer": "Третяк И.С",
+        "type": "Laboratory",
+        "subgroup": "A",
+        "classroom": "357(3)",
+        "time": {
+            "start": "16:00",
+            "end": "19:30"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.03.22"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.04.05"
+            }
+        ]
+    },
+    {
+        "title": "Компьютерная механика",
+        "lecturer": "Чеканин В.А",
+        "type": "Laboratory",
+        "subgroup": "A",
+        "classroom": "216",
+        "time": {
+            "start": "16:00",
+            "end": "19:30"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.04.26"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.05.24"
+            }
+        ]
+    },
+    {
+        "title": "Операционные системы",
+        "lecturer": "Пушкин А.Ю",
+        "type": "Lecture",
+        "subgroup": "Common",
+        "classroom": "0411",
+        "time": {
+            "start": "12:20",
+            "end": "14:00"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.04.20"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.04.27"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.05.18"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.05.25"
+            }
+        ]
+    },
+    {
+        "title": "Операционные системы",
+        "lecturer": "Пушкин А.Ю",
+        "type": "Lecture",
+        "subgroup": "Common",
+        "classroom": "0411",
+        "time": {
+            "start": "14:10",
+            "end": "15:50"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.02.09"
+            },
+            {
+                "frequency": "throughout",
+                "date": "2019.02.16-2019.03.16"
+            },
+            {
+                "frequency": "every",
+                "date": "2019.03.23-2019.04.27"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.05.18"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.05.25"
+            }
+        ]
+    },
+    {
+        "title": "Модели и методы теории вычислений",
+        "lecturer": "Бритвина В.В",
+        "type": "Laboratory",
+        "subgroup": "A",
+        "classroom": "216",
+        "time": {
+            "start": "16:00",
+            "end": "19:30"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.03.16"
+            }
+        ]
+    },
+    {
+        "title": "Модели и методы теории вычислений",
+        "lecturer": "Бритвина В.В",
+        "type": "Laboratory",
+        "subgroup": "A",
+        "classroom": "Чит.Зал",
+        "time": {
+            "start": "8:30",
+            "end": "12:00"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.03.30"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.04.13"
+            }
+        ]
+    },
+    {
+        "title": "Модели и методы теории вычислений",
+        "lecturer": "Бритвина В.В",
+        "type": "Laboratory",
+        "subgroup": "A",
+        "classroom": "216",
+        "time": {
+            "start": "8:30",
+            "end": "12:00"
+        },
+        "dates": [
+            {
+                "frequency": "once",
+                "date": "2019.04.27"
+            }
+        ]
+    },
+    {
+        "title": "Модели и методы теории вычислений",
+        "lecturer": "Бритвина В.В",
+        "type": "Laboratory",
+        "subgroup": "B",
+        "classroom": "Чит.Зал",
+        "time": {
+            "start": "8:30",
+            "end": "12:00"
+        },
+        "dates": [
+            {
+                "frequency": "throughout",
+                "date": "2019.03.23-2019.04.20"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.05.18"
+            }
+        ]
+    },
+    {
+        "title": "Инновационные технологии и автоматизированные комплексы цифрового машиностроительного производства",
+        "lecturer": "Пристинский Ю.О",
+        "type": "Laboratory",
+        "subgroup": "B",
+        "classroom": "235(в)",
+        "time": {
+            "start": "16:00",
+            "end": "19:30"
+        },
+        "dates": [
+            {
+                "frequency": "throughout",
+                "date": "2019.03.30-2019.04.27"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.05.25"
+            }
+        ]
+    },
+    {
+        "title": "Инновационные технологии и автоматизированные комплексы цифрового машиностроительного производства",
+        "lecturer": "Пристинский Ю.О",
+        "type": "Laboratory",
+        "subgroup": "A",
+        "classroom": "235(в)",
+        "time": {
+            "start": "16:00",
+            "end": "19:30"
+        },
+        "dates": [
+            {
+                "frequency": "throughout",
+                "date": "2019.03.23-2019.04.20"
+            },
+            {
+                "frequency": "once",
+                "date": "2019.05.18"
+            }
+        ]
+    }
+]

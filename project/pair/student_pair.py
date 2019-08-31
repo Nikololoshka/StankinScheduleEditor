@@ -10,6 +10,8 @@ from project.pair.classroom_pair import ClassroomPair
 from project.pair.time_pair import TimePair
 from project.pair.date_pair import DatePair
 
+import json
+
 
 class StudentPair:
     """ Class describing the student pair """
@@ -21,39 +23,39 @@ class StudentPair:
             "subgroup": SubgroupPair(),
             "classroom": ClassroomPair(),
             "time": TimePair(),
-            "date": DatePair()
+            "dates": DatePair()
         }
 
     @staticmethod
-    def from_xml(file: Xml.Element):
+    def from_json(file: dict):
         """
-        Load Pair from XML element. Returned StudentPair.
+        Load Pair from JSON element. Returned StudentPair.
         """
         pair = StudentPair()
         pair.load(file)
         return pair
 
-    def load(self, el: Xml.Element):
+    def load(self, el: dict):
         """
         Load StudentPair from XML element.
         """
         self._attributes = {
-            "title": TitlePair.from_xml_pair(el),
-            "lecturer": LecturerPair.from_xml_pair(el),
-            "type": TypePair.from_xml_pair(el),
-            "subgroup": SubgroupPair.from_xml_pair(el),
-            "classroom": ClassroomPair.from_xml_pair(el),
-            "time": TimePair.from_xml_pair(el),
-            "date": DatePair.from_xml_pair(el)
+            "title": TitlePair.from_json_pair(el),
+            "lecturer": LecturerPair.from_json_pair(el),
+            "type": TypePair.from_json_pair(el),
+            "subgroup": SubgroupPair.from_json_pair(el),
+            "classroom": ClassroomPair.from_json_pair(el),
+            "time": TimePair.from_json_pair(el),
+            "dates": DatePair.from_json_pair(el)
         }
 
-    def save(self) -> Xml.Element:
+    def save(self) -> dict:
         """
-        Save StudentPair to XML element.
+        Save StudentPair to dict for JSON.
         """
-        element = Xml.Element("pair")
-        for attrib in self._attributes.values():
-            element.append(attrib.save())
+        element = {}
+        for key, attrib in self._attributes.items():
+            element[key] = attrib.save()
 
         return element
 
@@ -86,7 +88,7 @@ class StudentPair:
         s = ""
         for attrib_name, attrib in self._attributes.items():
             if attrib.is_valid() and attrib_name != "time":
-                if attrib_name == "date":
+                if attrib_name == "dates":
                     s += "[" + str(attrib) + "]"
                 else:
                     s += str(attrib) + ". "

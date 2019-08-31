@@ -14,9 +14,9 @@ class TitlePair(AttribPair):
         self._title: str = s
 
     @staticmethod
-    def from_xml_pair(file: Xml.Element):
+    def from_json_pair(file):
         title = TitlePair()
-        title.load(file.find("title"))
+        title.load(file)
         return title
 
     def set_title(self, s: str):
@@ -27,13 +27,11 @@ class TitlePair(AttribPair):
         """
         self._title = s
 
-    def load(self, el: Xml.Element) -> None:
-        self._title = el.text
+    def load(self, json_element) -> None:
+        self._title = json_element["title"]
 
-    def save(self) -> Xml.Element:
-        element = Xml.Element("title")
-        element.text = self._title
-        return element
+    def save(self) -> str:
+        return self._title
 
     def copy(self):
         new_title = TitlePair(self._title)
