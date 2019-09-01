@@ -1,7 +1,7 @@
 # coding: utf-8
 
 # imports
-from project.pair import StudentPair, DateItem, DaysOfWeek
+from project.pair import StudentPair, DateItem, DaysOfWeek, SubgroupPairAttrib
 from project.util import SortedList
 from datetime import timedelta, date
 import json
@@ -40,7 +40,7 @@ class ScheduleElement:
             for line in self._pair_lines:
                 pairs = line.get(add_pair["time"].get_number())
                 if pairs is not None and pairs[0]["time"].duration() == \
-                        add_pair["time"].duration():
+                        add_pair["time"].duration() and self.is_merge(add_pair, pairs):
                     pairs.append(add_pair)
                     insert = True
                     break
@@ -58,6 +58,13 @@ class ScheduleElement:
 
             if not insert:
                 self._pair_lines.append({add_pair["time"].get_number(): [add_pair]})
+
+    def is_merge(self, added_pair: StudentPair, pairs: list) -> bool:
+        for pair in pairs:
+            if pair["subgroup"].get_subgroup() == added_pair["subgroup"].get_subgroup():
+                return True
+
+        return False
 
     def remove_pair(self, remove_pair: StudentPair) -> None:
         """
@@ -78,7 +85,7 @@ class ScheduleElement:
 
         return pairs
 
-    def get_pairs(self, number: int, duration: int) -> list:
+    def get_pairs(self, number: int, duration: int, line: int = -1) -> list:
         """
         Returns a list of pairs by their start number and duration.
 
@@ -86,6 +93,11 @@ class ScheduleElement:
         :param duration: Pair duration
         :return: A list of pairs
         """
+        if line != -1 and len(self._pair_lines) != 0:
+            pairs = self._pair_lines[line].get(number)
+            if pairs is not None and pairs[0]["time"].duration() == duration:
+                return pairs
+
         for line in self._pair_lines:
             pairs = line.get(number)
             if pairs is not None and pairs[0]["time"].duration() == duration:
@@ -251,7 +263,7 @@ class Schedule:
 
         return day, number, duration
 
-    def pairs_by_index(self, day: int, number: int, duration: int) -> list:
+    def pairs_by_index(self, day: int, number: int, duration: int, line: int = -1) -> list:
         """
         Returns a list of pairs in the table by indexes.
 
@@ -260,7 +272,7 @@ class Schedule:
         :param duration: Duration
         :return: A list of pairs
         """
-        return self._schedule_list[DaysOfWeek.value_of(day)].get_pairs(number, duration)
+        return self._schedule_list[DaysOfWeek.value_of(day)].get_pairs(number, duration, line)
 
     def add_pair(self, pair: StudentPair, back_mode: bool = False) -> None:
         """

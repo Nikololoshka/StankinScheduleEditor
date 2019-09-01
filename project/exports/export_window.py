@@ -122,7 +122,7 @@ class ExportWindow(QDialog):
         self.date_edit_start.setCalendarPopup(True)
         self.date_edit_end.setCalendarPopup(True)
 
-        if QDate.currentDate().day() < QDate.currentDate().dayOfYear() / 2:
+        if QDate.currentDate().day() < (QDate.currentDate().dayOfYear() / 2):
             date = QDate(QDate.currentDate().year(), 2, 1)
         else:
             date = QDate(QDate.currentDate().year(), 9, 1)

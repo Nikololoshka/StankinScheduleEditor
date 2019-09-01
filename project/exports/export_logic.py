@@ -22,6 +22,7 @@ def export_weeks_to_pdf(schedule_ref: Schedule, title_text: str, add_date: bool,
     """
     Method for exports to PDF file
     """
+
     file = QFileInfo(file_path)
 
     # pdf
@@ -130,7 +131,7 @@ def export_weeks_to_pdf(schedule_ref: Schedule, title_text: str, add_date: bool,
                             #          border=1)
 
                             day, number, duration = i - 1, j - 1, x_span_count
-                            pairs = schedule.pairs_by_index(day, number, duration)
+                            pairs = schedule.pairs_by_index(day, number, duration, number_row)
 
                             # select color for cell
                             if all(pair["subgroup"].get_subgroup() == SubgroupPairAttrib.Common
@@ -139,6 +140,7 @@ def export_weeks_to_pdf(schedule_ref: Schedule, title_text: str, add_date: bool,
                                 pdf.cell(step_column * x_span_count,
                                          simple_row * y_span_count,
                                          border=1)
+
                             elif all(pair["subgroup"].get_subgroup() == SubgroupPairAttrib.A
                                      for pair in pairs):
                                 # A subgroup
@@ -180,15 +182,15 @@ def export_weeks_to_pdf(schedule_ref: Schedule, title_text: str, add_date: bool,
                                         pdf.set_fill_color(color.red(), color.green(), color.blue())
                                         pdf.cell(step_column * x_span_count / column,
                                                  simple_row * y_span_count / row,
-                                                 border=0,
-                                                 fill=1)
+                                                 border=0)
+
                                 pdf.set_xy(prev_x, prev_y)
                                 pdf.cell(step_column * x_span_count,
                                          simple_row * y_span_count,
                                          border=1)
 
-                            text = item.text()
-                            if text != "":
+                            if len(pairs) != 0:
+                                text = "\n".join(str(pair) for pair in pairs)
                                 draw_text(pdf, x + first_row + step_column * (j - 1),
                                           y + title + first_column + step_row
                                           * (i - 1) + simple_row * number_row,

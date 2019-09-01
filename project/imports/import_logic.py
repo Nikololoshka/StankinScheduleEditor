@@ -87,8 +87,8 @@ class ConfuseSituationException(Exception):
 
 
 class PairParser:
-    Pattern_title = r"([\w\s\,\-\(\)\/]+?\.)"               # 0
-    Pattern_lecturer = r"([а-яА-Я]+\s([а-яА-я]\.?){1,2})?"  # 1
+    Pattern_title = r"([а-яА-Яa-zA-Z0-9\s\,\-\(\)\/\:]+?\.)"# 0
+    Pattern_lecturer = r"([а-яА-Я\_]+\s([а-яА-я]\.?){1,2})?"  # 1
     Pattern_type = r"([а-яА-я\s]+?\.)"                      # 3
     Pattern_subgroup = r"(\([абАБ]\)\.)?"                   # 4
     Pattern_classroom = r"([^\[\]]+?\.)"                    # 5
@@ -391,7 +391,7 @@ def parse_classroom(classroom_str, manager: ImportManager, text):
                 score = seq.ratio()
                 maybe = element
 
-        if score < 0.95:
+        if score < 0.975:
             ex = ConfuseSituationException()
             ex.confuse = classroom_str
             ex.confuse_type = "Invalid classroom"
