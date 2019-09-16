@@ -43,6 +43,8 @@ class ImportManager:
         self.lecturers_list = []
         self.classrooms_list = []
 
+        self.classrooms_translate = {}
+
         with open("res/titles.txt", "r", encoding="utf-8") as file:
             for line in file:
                 self.titles_list.append(line.strip())
@@ -54,6 +56,11 @@ class ImportManager:
         with open("res/classrooms.txt", "r", encoding="utf-8") as file:
             for line in file:
                 self.classrooms_list.append(line.strip())
+
+        with open("res/classrooms-translate.txt", "r", encoding="utf-8") as file:
+            for line in file:
+                lst = line.split("->")
+                self.classrooms_translate[lst[0].strip()] = lst[1].strip()
 
         mp = Manager()
 
@@ -87,12 +94,13 @@ class ConfuseSituationException(Exception):
 
 
 class PairParser:
+    # ([а-яА-Яa-zA-Z0-9\s\,\-\(\)\/\:]+?\.)\s?([а-яА-Я\_]+\s([а-яА-я]\.?){1,2})?\s?([а-яА-я\s]+?\.)\s?(\([абАБ]\)\.)?\s?([^\[\]]+?\.)\s?(\[((\,)|(\s?(\d{2}\.\d{2})\-(\d{2}\.\d{2})\s*?([чк]\.[н]\.)|(\s?(\d{2}\.\d{2}))))+\])
     Pattern_title = r"([а-яА-Яa-zA-Z0-9\s\,\-\(\)\/\:]+?\.)"# 0
     Pattern_lecturer = r"([а-яА-Я\_]+\s([а-яА-я]\.?){1,2})?"  # 1
     Pattern_type = r"([а-яА-я\s]+?\.)"                      # 3
     Pattern_subgroup = r"(\([абАБ]\)\.)?"                   # 4
     Pattern_classroom = r"([^\[\]]+?\.)"                    # 5
-    Pattern_date = r"(\[.+?\])"                             # 6
+    Pattern_date = r"(\[((\,)|(\s?(\d{2}\.\d{2})\-(\d{2}\.\d{2})\s*?([чкЧК]\.[нН]\.{1,2})|(\s?(\d{2}\.\d{2}))))+\])"                             # 6
 
     Pattern = r"\s?".join([Pattern_title,
                            Pattern_lecturer,
@@ -241,6 +249,7 @@ def import_from_pdf(process_id, manager: ImportManager) -> None:
                                                                              process)
 
             schedule.save(file.absoluteFilePath()[0:-4] + ".json")
+            print(file.absoluteFilePath()[0:-4] + ".json")
 
             if manager.flags["stop"]:
                 break
@@ -382,6 +391,9 @@ def parse_classroom(classroom_str, manager: ImportManager, text):
 
         if classroom_str == "":
             return ""
+
+        if classroom_str in manager.classrooms_translate:
+            return manager.classrooms_translate[classroom_str]
 
         score = -1
         maybe = "not find"
