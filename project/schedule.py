@@ -59,7 +59,8 @@ class ScheduleElement:
             if not insert:
                 self._pair_lines.append({add_pair["time"].get_number(): [add_pair]})
 
-    def is_merge(self, added_pair: StudentPair, pairs: list) -> bool:
+    @staticmethod
+    def is_merge(added_pair: StudentPair, pairs: list) -> bool:
         for pair in pairs:
             if pair["subgroup"].get_subgroup() == added_pair["subgroup"].get_subgroup():
                 return True
